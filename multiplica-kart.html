@@ -298,6 +298,7 @@ body{background:#111;display:flex;justify-content:center;align-items:flex-start;
     <div id="turn-lbl">—</div>
     <span class="op-badge" id="op-badge">✖️</span>
     <span id="grade-badge">1° grado</span>
+    <button onclick="confirmExit()" style="background:transparent;border:1px solid rgba(255,255,255,.15);color:#666;font-size:11px;padding:3px 8px;border-radius:6px;cursor:pointer;font-family:'Courier New',monospace;-webkit-tap-highlight-color:transparent;">✕ Salir</button>
   </div>
   <div id="qpanel">
     <div id="q-turn">TURNO</div>
@@ -464,46 +465,49 @@ function genSpecialTiles(){
 
 function drawSpecialTiles(){
   document.querySelectorAll('.special-tile').forEach(e=>e.remove());
-  scheduleDynamicTile();
+  // Arrancar con 2 obstáculos inmediatos + ciclo continuo
+  spawnDynamicObstacle();
+  setTimeout(()=>spawnDynamicObstacle(), 1500);
 }
 
 function spawnTileEl(t,tw){
   tw=tw||document.getElementById('lanes-el').offsetWidth||300;
-  const el=document.createElement('div'); el.className='special-tile'; el.textContent=t.type;
+  const el=document.createElement('div'); el.className='special-tile';
+  // Forzar variante emoji colorida para 🍀
+  el.textContent = t.type==='🍀' ? '🍀\uFE0F' : t.type;
   el.style.left=((t.pos/cfg.goal)*tw+4)+'px';
   document.getElementById('track').appendChild(el);
   t.el=el;
 }
 
 function scheduleDynamicTile(){
-  const delay=8000+Math.random()*4000; // cada 8-12s
-  const tid=setTimeout(()=>{
-    spawnDynamicObstacle();
-  },delay);
+  const delay=3000+Math.random()*2000; // cada 3-5s
+  const tid=setTimeout(()=>{ spawnDynamicObstacle(); },delay);
   tileTimers.push(tid);
 }
 
 function spawnDynamicObstacle(){
   const tw=document.getElementById('lanes-el').offsetWidth||300;
+  // Todo el mapa disponible — solo evitar posición 0 y meta exacta
   const used=new Set([0,cfg.goal,...specialTiles.map(t=>t.pos)]);
   let pos,tries=0;
-  do{ pos=Math.floor(Math.random()*(cfg.goal-2))+1; tries++; }while(used.has(pos)&&tries<20);
+  do{ pos=Math.floor(Math.random()*cfg.goal)+1; tries++; }while(used.has(pos)&&tries<30);
+  if(tries>=30) { scheduleDynamicTile(); return; } // mapa lleno, reintenta
   const type=DYNAMIC_TILES[Math.floor(Math.random()*DYNAMIC_TILES.length)];
   const tile={pos,type,dynamic:true,el:null};
   specialTiles.push(tile);
   spawnTileEl(tile,tw);
 
-  // Aviso de que va a desaparecer a los 7s
+  // Parpadeo a los 7s
   const warnId=setTimeout(()=>{ if(tile.el) tile.el.classList.add('expiring'); },7000);
   tileTimers.push(warnId);
 
-  // Si es bomba → explota sola a los 10s
-  const lifespan = type==='💣' ? 10000 : 10000;
+  // Vida: 10s — bomba explota, resto desaparece
   const removeId=setTimeout(()=>{
     if(type==='💣') explodeBomb(tile);
     else removeTile(tile);
-    scheduleDynamicTile(); // programar el siguiente
-  },lifespan);
+    scheduleDynamicTile();
+  },10000);
   tileTimers.push(removeId);
 }
 
@@ -707,7 +711,12 @@ function checkAnswer(){
         beep(800,.3,'sine',.08);
       }
       fb.textContent=msg; fb.className='special'; showTilePopup(msg);
-      if(tile.type==='🍄'||tile.type==='🍀'){ updateTokens(); setTimeout(()=>{ checkFinish(p); if(!p.finished) nextTurn(); },1400); return; }
+      if(tile.type==='🍄'||tile.type==='🍀'){
+        updateTokens();
+        checkFinish(p);
+        setTimeout(()=>{ if(p.finished) advanceTurn(); else nextTurn(); },1400);
+        return;
+      }
     } else { fb.textContent='✓ ¡Correcto! +1 casilla'; fb.className='ok'; }
     updateTokens(); checkFinish(p);
     if(p.finished){ setTimeout(advanceTurn,800); return; }
@@ -772,6 +781,15 @@ function toggleHistory(){
   }
 }
 function backToSetup(){ document.getElementById('podium-screen').style.display='none'; document.getElementById('setup').style.display='block'; }
+
+function confirmExit(){
+  if(confirm('¿Salir de la partida actual?')){
+    clearTileTimers();
+    stopTimer();
+    document.getElementById('game').style.display='none';
+    document.getElementById('setup').style.display='block';
+  }
+}
 
 // Inicializar jugadores por defecto
 const list=document.getElementById('players-list');
