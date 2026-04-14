@@ -28,6 +28,11 @@ body{background:#111;display:flex;justify-content:center;align-items:flex-start;
 .player-row input{flex:1;padding:10px;border-radius:6px;border:1.5px solid rgba(255,255,255,0.15);font-family:'Courier New',monospace;font-size:14px;background:rgba(255,255,255,0.05);color:#fff;outline:none;min-height:44px;}
 .player-row input:focus{border-color:#a78bfa;}
 .add-btn{width:100%;background:transparent;border:1.5px dashed rgba(255,255,255,0.2);color:#888;font-size:13px;padding:10px;border-radius:6px;cursor:pointer;margin-top:4px;font-family:'Courier New',monospace;min-height:44px;-webkit-tap-highlight-color:transparent;}
+.char-picker{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;padding:6px 0 2px;}
+.char-opt{width:44px;height:44px;border-radius:8px;border:2px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:3px;-webkit-tap-highlight-color:transparent;transition:border-color .15s,background .15s;flex-shrink:0;}
+.char-opt img{width:34px;height:34px;object-fit:contain;image-rendering:pixelated;}
+.char-opt.selected{border-color:#facc15;background:rgba(250,204,21,.15);}
+.char-opt:active{opacity:.7;}
 .goal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
 #start-btn{width:100%;background:#7c3aed;color:#fff;border:none;border-radius:8px;font-size:clamp(16px,4vw,20px);font-family:'Courier New',monospace;font-weight:bold;padding:14px;cursor:pointer;border-bottom:4px solid #4c1d95;margin-top:8px;letter-spacing:1px;min-height:52px;-webkit-tap-highlight-color:transparent;}
 #start-btn:active{transform:translateY(2px);border-bottom-width:1px;}
@@ -161,10 +166,7 @@ body{background:#111;display:flex;justify-content:center;align-items:flex-start;
 
   <div class="sbox">
     <div class="sbox-label">JUGADORES (2–6)</div>
-    <div id="players-list">
-      <div class="player-row"><span>🍄</span><input type="text" value="Jugador 1" autocomplete="off"/></div>
-      <div class="player-row"><span>⭐</span><input type="text" value="Jugador 2" autocomplete="off"/></div>
-    </div>
+    <div id="players-list"></div>
     <button class="add-btn" id="add-btn">+ Agregar jugador</button>
   </div>
 
@@ -246,17 +248,16 @@ body{background:#111;display:flex;justify-content:center;align-items:flex-start;
 </div>
 
 <script>
-// ── PERSONALIZACIÓN DE PERSONAJES ──
-// Descomenta y edita para usar GIFs:
-// const CHAR_IMGS = [
-//   'assets/chars/mario.gif',
-//   'assets/chars/luigi.gif',
-//   'assets/chars/peach.gif',
-//   'assets/chars/toad.gif',
-//   'assets/chars/yoshi.gif',
-//   'assets/chars/bowser.gif',
-// ];
-const CHAR_IMGS = [null,null,null,null,null,null];
+const ALL_CHARS = [
+  'assets/chars/mario.gif',
+  'assets/chars/luigi.gif',
+  'assets/chars/princesstoadstool.gif',
+  'assets/chars/donkeykong.gif',
+  'assets/chars/koopatroopasmall.gif',
+  'assets/chars/3vlG.gif',
+  'assets/chars/3vlN.gif',
+  'assets/chars/3vlP.gif',
+];
 
 const EMOJIS = ['🍄','⭐','🐢','🔥','💎','🌸'];
 const GRADE_CFG = {
@@ -317,16 +318,38 @@ document.getElementById('add-btn').onclick=()=>{
   const list=document.getElementById('players-list');
   if(list.children.length>=6) return;
   const i=list.children.length;
-  const row=document.createElement('div'); row.className='player-row';
-  row.innerHTML=`<span>${EMOJIS[i]}</span><input type="text" value="Jugador ${i+1}" autocomplete="off"/>`;
-  list.appendChild(row);
+  list.appendChild(buildPlayerRow(i));
 };
 document.getElementById('start-btn').onclick=()=>{
-  const inputs=[...document.querySelectorAll('#players-list input')];
-  players=inputs.map((inp,i)=>({name:inp.value.trim()||`Jugador ${i+1}`,emoji:EMOJIS[i],img:CHAR_IMGS[i]||null,pos:0,finished:false,finishOrder:null}));
+  const rows=[...document.querySelectorAll('#players-list .player-row')];
+  players=rows.map((row,i)=>({
+    name: row.querySelector('input').value.trim()||`Jugador ${i+1}`,
+    emoji: EMOJIS[i],
+    img: row.querySelector('.char-opt.selected')?.dataset.src || null,
+    pos:0, finished:false, finishOrder:null
+  }));
   if(players.length<2){ alert('Mínimo 2 jugadores'); return; }
   initGame();
 };
+
+function buildPlayerRow(i){
+  const row=document.createElement('div'); row.className='player-row'; row.style.flexDirection='column'; row.style.alignItems='stretch';
+  const top=document.createElement('div'); top.style.cssText='display:flex;gap:8px;align-items:center;';
+  top.innerHTML=`<span>${EMOJIS[i]}</span><input type="text" value="Jugador ${i+1}" autocomplete="off" style="flex:1;padding:10px;border-radius:6px;border:1.5px solid rgba(255,255,255,0.15);font-family:'Courier New',monospace;font-size:14px;background:rgba(255,255,255,0.05);color:#fff;outline:none;min-height:44px;"/>`;
+  const picker=document.createElement('div'); picker.className='char-picker';
+  ALL_CHARS.forEach((src,ci)=>{
+    const opt=document.createElement('div'); opt.className='char-opt'+(ci===i?' selected':''); opt.dataset.src=src;
+    opt.innerHTML=`<img src="${src}" alt="char"/>`;
+    opt.onclick=()=>{
+      picker.querySelectorAll('.char-opt').forEach(x=>x.classList.remove('selected'));
+      opt.classList.add('selected');
+    };
+    picker.appendChild(opt);
+  });
+  row.appendChild(top); row.appendChild(picker);
+  return row;
+}
+
 document.getElementById('q-input').addEventListener('keydown',e=>{ if(e.key==='Enter') checkAnswer(); });
 
 // ── SPECIAL TILES ──
@@ -550,6 +573,11 @@ function toggleHistory(){
   }
 }
 function backToSetup(){ document.getElementById('podium-screen').style.display='none'; document.getElementById('setup').style.display='block'; }
+
+// Inicializar jugadores por defecto
+const list=document.getElementById('players-list');
+list.appendChild(buildPlayerRow(0));
+list.appendChild(buildPlayerRow(1));
 </script>
 </body>
 </html>
