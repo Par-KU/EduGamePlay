@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+<title>Escape de Fracciones — EduGamePlay</title>
+<link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Crimson+Pro:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --stone:#1a1714;--stone2:#252118;--stone3:#2e2a22;
+  --gold:#d4a017;--gold2:#f0c040;
+  --red:#c0392b;--green:#27ae60;
+  --text:#e8dcc8;--muted:#8a7a5a;
+  --door:#5c3d1e;--door2:#7a5230;
+  --torch:#e8692a;
+  --radius:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{
+  font-family:'Crimson Pro',serif;
+  background:var(--stone);
+  color:var(--text);
+  display:flex;justify-content:center;align-items:center;
+  min-height:100vh;
+}
+
+/* ── STONE TEXTURE ── */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,0,0,.15) 39px,rgba(0,0,0,.15) 40px),
+    repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(0,0,0,.1) 59px,rgba(0,0,0,.1) 60px);
+  pointer-events:none;z-index:0;
+}
+
+#app{position:relative;z-index:1;width:100%;max-width:520px;padding:12px;}
+
+/* ── SETUP ── */
+#setup{text-align:center;padding:20px 0;}
+.dungeon-title{
+  font-family:'MedievalSharp','Crimson Pro',serif;
+  font-size:clamp(28px,7vw,42px);
+  color:var(--gold2);
+  text-shadow:0 0 20px rgba(212,160,23,.4),2px 2px 0 rgba(0,0,0,.8);
+  margin-bottom:6px;line-height:1.1;
+}
+.dungeon-sub{font-size:14px;color:var(--muted);margin-bottom:24px;}
+.sbox{
+  background:var(--stone2);
+  border:1px solid rgba(212,160,23,.2);
+  border-radius:var(--radius);
+  padding:14px;margin-bottom:12px;text-align:left;
+}
+.sbox-label{font-size:11px;font-weight:600;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;}
+.level-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
+.lv-btn{
+  padding:10px 4px;border:1.5px solid rgba(212,160,23,.2);
+  border-radius:6px;background:transparent;color:var(--muted);
+  font-family:'Crimson Pro',serif;font-size:13px;cursor:pointer;
+  text-align:center;transition:all .15s;min-height:44px;
+}
+.lv-btn:active{opacity:.7;}
+.lv-btn.active{background:rgba(212,160,23,.15);border-color:var(--gold);color:var(--gold2);}
+.name-input{
+  width:100%;padding:10px 14px;
+  border:1px solid rgba(212,160,23,.3);border-radius:6px;
+  background:rgba(0,0,0,.3);color:var(--text);
+  font-family:'Crimson Pro',serif;font-size:16px;outline:none;
+  min-height:44px;
+}
+.name-input:focus{border-color:var(--gold);}
+.start-btn{
+  width:100%;background:var(--gold);color:#1a1200;
+  border:none;border-radius:8px;
+  font-family:'MedievalSharp','Crimson Pro',serif;
+  font-size:clamp(16px,4vw,20px);
+  padding:14px;cursor:pointer;
+  border-bottom:4px solid #8a6800;
+  margin-top:8px;letter-spacing:1px;
+  transition:transform .1s,border-bottom-width .1s;
+}
+.start-btn:active{transform:translateY(2px);border-bottom-width:1px;}
+.level-desc{font-size:12px;color:var(--muted);margin-top:8px;min-height:36px;line-height:1.5;text-align:center;}
+
+/* ── GAME ── */
+#game{display:none;}
+
+/* Dungeon scene */
+.dungeon-scene{
+  position:relative;
+  background:var(--stone2);
+  border:2px solid rgba(212,160,23,.2);
+  border-radius:var(--radius);
+  overflow:hidden;
+  height:clamp(180px,40vw,220px);
+  margin-bottom:10px;
+}
+/* Stone wall pattern */
+.dungeon-scene::before{
+  content:'';position:absolute;inset:0;
+  background:
+    repeating-linear-gradient(0deg,transparent,transparent 29px,rgba(0,0,0,.2) 29px,rgba(0,0,0,.2) 30px),
+    repeating-linear-gradient(90deg,transparent,transparent 44px,rgba(0,0,0,.15) 44px,rgba(0,0,0,.15) 45px);
+}
+/* Floor */
+.dungeon-scene::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:40px;
+  background:var(--stone3);
+  border-top:2px solid rgba(0,0,0,.4);
+}
+
+/* Torches */
+.torch{
+  position:absolute;top:20px;font-size:20px;
+  animation:flicker 1.2s ease-in-out infinite;
+  z-index:2;filter:drop-shadow(0 0 8px var(--torch));
+}
+.torch.left{left:16px;}
+.torch.right{right:16px;}
+@keyframes flicker{0%,100%{opacity:1;transform:scaleY(1)}50%{opacity:.85;transform:scaleY(.93)}}
+
+/* Door */
+.door-wrap{
+  position:absolute;bottom:38px;left:50%;transform:translateX(-50%);
+  z-index:3;
+}
+.door{
+  width:clamp(60px,14vw,80px);
+  height:clamp(90px,21vw,110px);
+  background:var(--door);
+  border:3px solid #3a2510;
+  border-radius:6px 6px 0 0;
+  position:relative;
+  transition:transform .5s ease, opacity .5s;
+  transform-origin:left center;
+}
+.door.open{transform:perspective(300px) rotateY(-70deg);opacity:.4;}
+.door-planks{
+  position:absolute;inset:4px;
+  background:repeating-linear-gradient(180deg,var(--door2) 0 18px,var(--door) 18px 20px);
+  border-radius:4px 4px 0 0;
+}
+.door-handle{
+  position:absolute;right:8px;top:50%;
+  width:8px;height:8px;
+  background:var(--gold);border-radius:50%;
+  transform:translateY(-50%);
+  box-shadow:0 0 4px var(--gold2);
+}
+.door-lock{
+  position:absolute;left:50%;top:35%;transform:translate(-50%,-50%);
+  width:20px;height:22px;
+  background:#3a2510;border:2px solid var(--gold);
+  border-radius:4px;display:flex;align-items:center;justify-content:center;
+  font-size:12px;
+}
+.door-lock.unlocked{border-color:var(--green);animation:unlockPulse .5s ease;}
+@keyframes unlockPulse{0%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.4)}100%{transform:translate(-50%,-50%) scale(1)}}
+
+/* Character */
+.character{
+  position:absolute;bottom:40px;z-index:4;
+  font-size:clamp(28px,7vw,36px);
+  transition:left .6s ease;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.6));
+}
+.character.shake{animation:cshake .4s ease;}
+@keyframes cshake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+
+/* Guard */
+.guard{
+  position:absolute;bottom:40px;right:20px;z-index:4;
+  font-size:clamp(28px,7vw,36px);
+  opacity:0;transition:opacity .3s,right .4s;
+  filter:drop-shadow(0 2px 4px rgba(192,57,43,.5));
+}
+.guard.visible{opacity:1;}
+
+/* Room counter */
+.room-badge{
+  position:absolute;top:10px;left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,.6);border:1px solid rgba(212,160,23,.3);
+  border-radius:20px;padding:3px 12px;
+  font-size:11px;color:var(--gold);letter-spacing:1px;z-index:5;
+  white-space:nowrap;
+}
+
+/* ── HUD ── */
+.hud{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 12px;
+  background:var(--stone2);
+  border:1px solid rgba(212,160,23,.15);
+  border-radius:var(--radius);
+  margin-bottom:10px;
+}
+.lives{display:flex;gap:4px;}
+.heart{font-size:16px;transition:opacity .3s;}
+.heart.lost{opacity:.2;filter:grayscale(1);}
+.hud-spacer{flex:1;}
+.level-badge{
+  font-size:11px;color:var(--gold);
+  background:rgba(212,160,23,.1);
+  border:1px solid rgba(212,160,23,.2);
+  border-radius:20px;padding:2px 10px;
+}
+.timer-wrap{display:flex;align-items:center;gap:6px;}
+.timer-num{font-size:16px;font-weight:600;color:var(--gold2);min-width:24px;text-align:right;}
+.timer-bar-bg{width:60px;height:6px;background:rgba(0,0,0,.4);border-radius:3px;overflow:hidden;}
+.timer-bar-fill{height:100%;background:var(--green);border-radius:3px;transition:width .1s linear,background .3s;}
+
+/* ── FRACTION PANEL ── */
+.frac-panel{
+  background:var(--stone2);
+  border:1px solid rgba(212,160,23,.2);
+  border-radius:var(--radius);
+  padding:14px 16px;
+  margin-bottom:10px;
+}
+.frac-room-txt{font-size:11px;color:var(--muted);margin-bottom:6px;letter-spacing:.5px;}
+.frac-question{
+  font-size:clamp(20px,5vw,26px);
+  color:var(--text);
+  font-weight:600;
+  margin-bottom:12px;
+  min-height:40px;
+  line-height:1.3;
+}
+/* Fraction display */
+.frac-visual{
+  display:inline-flex;flex-direction:column;
+  align-items:center;vertical-align:middle;
+  margin:0 4px;line-height:1.1;
+}
+.frac-visual .num{border-bottom:2px solid var(--gold);padding-bottom:1px;}
+.frac-visual .num,.frac-visual .den{font-size:.85em;display:block;text-align:center;min-width:20px;}
+
+/* Fraction image (pie/bar) */
+.frac-img-wrap{margin-bottom:10px;}
+.frac-img{display:flex;gap:4px;flex-wrap:wrap;}
+.frac-piece{
+  width:clamp(28px,7vw,36px);height:clamp(28px,7vw,36px);
+  border:2px solid var(--gold);border-radius:4px;
+}
+.frac-piece.filled{background:var(--gold);}
+.frac-piece.empty{background:transparent;}
+
+.answer-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.ans-input{
+  width:clamp(70px,18vw,90px);
+  font-size:clamp(18px,5vw,22px);
+  font-family:'Crimson Pro',serif;
+  text-align:center;
+  border:2px solid rgba(212,160,23,.4);border-radius:6px;
+  background:rgba(0,0,0,.4);color:var(--text);
+  padding:8px 4px;outline:none;min-height:48px;
+}
+.ans-input:focus{border-color:var(--gold);}
+.ans-slash{font-size:24px;color:var(--gold);font-weight:bold;}
+.ok-btn{
+  background:var(--gold);color:#1a1200;border:none;
+  border-radius:6px;font-family:'Crimson Pro',serif;
+  font-size:clamp(14px,4vw,16px);font-weight:600;
+  padding:10px 20px;cursor:pointer;
+  border-bottom:3px solid #8a6800;
+  min-height:48px;flex:1;max-width:120px;
+  -webkit-tap-highlight-color:transparent;
+}
+.ok-btn:active{transform:translateY(1px);border-bottom-width:1px;}
+.ok-btn:disabled{opacity:.4;cursor:default;}
+.feedback{
+  font-size:clamp(12px,3vw,14px);font-weight:600;
+  min-width:100px;flex:1;
+}
+.feedback.ok{color:var(--green);}
+.feedback.fail{color:var(--red);}
+
+/* Options (multiple choice) */
+.options-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px;}
+.opt-btn{
+  padding:10px;border:1.5px solid rgba(212,160,23,.25);
+  border-radius:6px;background:rgba(0,0,0,.3);
+  color:var(--text);font-family:'Crimson Pro',serif;
+  font-size:clamp(14px,4vw,17px);cursor:pointer;
+  text-align:center;transition:all .15s;min-height:48px;
+  -webkit-tap-highlight-color:transparent;
+}
+.opt-btn:active:not(:disabled){background:rgba(212,160,23,.15);}
+.opt-btn.correct{background:rgba(39,174,96,.25);border-color:var(--green);color:#7dffaa;}
+.opt-btn.wrong{background:rgba(192,57,43,.25);border-color:var(--red);color:#ff9090;}
+.opt-btn:disabled{cursor:default;}
+
+/* ── OVERLAYS ── */
+.overlay{
+  position:fixed;inset:0;z-index:100;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.85);
+}
+.overlay-box{
+  background:var(--stone2);
+  border:2px solid rgba(212,160,23,.4);
+  border-radius:12px;
+  padding:clamp(20px,5vw,32px);
+  text-align:center;
+  max-width:360px;width:90%;
+}
+.ov-icon{font-size:clamp(40px,10vw,56px);margin-bottom:12px;}
+.ov-title{
+  font-family:'MedievalSharp','Crimson Pro',serif;
+  font-size:clamp(20px,5vw,28px);
+  color:var(--gold2);margin-bottom:8px;
+}
+.ov-sub{font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.6;}
+.ov-stars{font-size:28px;margin-bottom:12px;}
+.ov-btn{
+  background:var(--gold);color:#1a1200;border:none;
+  border-radius:8px;font-family:'MedievalSharp','Crimson Pro',serif;
+  font-size:15px;padding:12px 28px;cursor:pointer;
+  border-bottom:3px solid #8a6800;margin:4px;
+  min-height:44px;-webkit-tap-highlight-color:transparent;
+}
+.ov-btn.sec{background:transparent;border:1px solid rgba(212,160,23,.3);color:var(--muted);border-bottom-width:1px;}
+
+/* Back link */
+.back-link{display:block;text-align:center;padding:10px;color:var(--muted);font-size:12px;text-decoration:none;margin-top:4px;}
+
+/* Transition flash */
+.room-flash{
+  position:fixed;inset:0;z-index:50;
+  background:#000;opacity:0;pointer-events:none;
+  transition:opacity .3s;
+}
+.room-flash.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+<!-- SETUP -->
+<div id="setup">
+  <div class="dungeon-title">🗝️ Escape de<br>Fracciones</div>
+  <div class="dungeon-sub">Resuelve fracciones para abrir las puertas y escapar</div>
+
+  <div class="sbox">
+    <div class="sbox-label">Tu nombre</div>
+    <input class="name-input" id="player-name" type="text" placeholder="¿Cómo te llamas?" maxlength="20" autocomplete="off"/>
+  </div>
+
+  <div class="sbox">
+    <div class="sbox-label">Nivel de dificultad</div>
+    <div class="level-grid">
+      <button class="lv-btn active" data-lv="1">1</button>
+      <button class="lv-btn" data-lv="2">2</button>
+      <button class="lv-btn" data-lv="3">3</button>
+      <button class="lv-btn" data-lv="4">4</button>
+      <button class="lv-btn" data-lv="5">5</button>
+    </div>
+    <div class="level-desc" id="lv-desc">Nivel 1 · Identificar fracciones en imágenes simples</div>
+  </div>
+
+  <button class="start-btn" id="start-btn">⚔️ Entrar a la mazmorra</button>
+  <a class="back-link" href="index.html">← Volver al inicio</a>
+</div>
+
+<!-- GAME -->
+<div id="game">
+  <!-- Dungeon scene -->
+  <div class="dungeon-scene">
+    <div class="room-badge" id="room-badge">Habitación 1 / 5</div>
+    <div class="torch left">🔥</div>
+    <div class="torch right">🔥</div>
+    <div class="door-wrap">
+      <div class="door" id="door">
+        <div class="door-planks"></div>
+        <div class="door-handle"></div>
+        <div class="door-lock" id="door-lock">🔒</div>
+      </div>
+    </div>
+    <div class="character" id="character" style="left:15%">🧙</div>
+    <div class="guard" id="guard">👹</div>
+  </div>
+
+  <!-- HUD -->
+  <div class="hud">
+    <div class="lives" id="lives">
+      <span class="heart" id="h1">❤️</span>
+      <span class="heart" id="h2">❤️</span>
+      <span class="heart" id="h3">❤️</span>
+    </div>
+    <div class="hud-spacer"></div>
+    <div class="level-badge" id="lv-badge">Nivel 1</div>
+    <div class="timer-wrap">
+      <div class="timer-bar-bg"><div class="timer-bar-fill" id="timer-fill" style="width:100%"></div></div>
+      <div class="timer-num" id="timer-num">20</div>
+    </div>
+  </div>
+
+  <!-- Fraction panel -->
+  <div class="frac-panel">
+    <div class="frac-room-txt" id="frac-room-txt">PUERTA 1</div>
+    <div class="frac-img-wrap" id="frac-img-wrap"></div>
+    <div class="frac-question" id="frac-question">¿Qué fracción representa la figura?</div>
+    <!-- Multiple choice options -->
+    <div class="options-grid" id="options-grid" style="display:none"></div>
+    <!-- Input answer -->
+    <div class="answer-row" id="answer-row" style="display:none">
+      <input class="ans-input" id="ans-num" type="number" inputmode="numeric" min="0" max="99" placeholder="?" autocomplete="off"/>
+      <span class="ans-slash" id="ans-slash">/</span>
+      <input class="ans-input" id="ans-den" type="number" inputmode="numeric" min="1" max="99" placeholder="?" autocomplete="off" id="ans-den"/>
+      <button class="ok-btn" id="ok-btn" onclick="checkAnswer()">OK ✓</button>
+      <div class="feedback" id="feedback"></div>
+    </div>
+    <!-- Single number answer -->
+    <div class="answer-row" id="single-row" style="display:none">
+      <input class="ans-input" id="ans-single" type="number" inputmode="numeric" min="0" max="999" placeholder="?" autocomplete="off"/>
+      <button class="ok-btn" id="ok-single" onclick="checkAnswer()">OK ✓</button>
+      <div class="feedback" id="feedback2"></div>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAYS -->
+<div class="overlay" id="ov-victory" style="display:none">
+  <div class="overlay-box">
+    <div class="ov-icon">🏆</div>
+    <div class="ov-title">¡Escapaste!</div>
+    <div class="ov-stars" id="ov-stars">⭐⭐⭐</div>
+    <div class="ov-sub" id="ov-sub">¡Excelente trabajo!</div>
+    <button class="ov-btn" onclick="nextLevel()">▶ Siguiente nivel</button>
+    <button class="ov-btn sec" onclick="backToSetup()">⚙️ Menú</button>
+  </div>
+</div>
+
+<div class="overlay" id="ov-gameover" style="display:none">
+  <div class="overlay-box">
+    <div class="ov-icon">💀</div>
+    <div class="ov-title">¡Atrapado!</div>
+    <div class="ov-sub" id="go-sub">El guardián te detuvo. ¿Intentas de nuevo?</div>
+    <button class="ov-btn" onclick="retryGame()">🔄 Reintentar</button>
+    <button class="ov-btn sec" onclick="backToSetup()">⚙️ Menú</button>
+  </div>
+</div>
+
+<div class="room-flash" id="room-flash"></div>
+
+<script>
+// ── AUDIO ──
+let AC;
+function getAC(){ if(!AC) AC=new(window.AudioContext||window.webkitAudioContext)(); return AC; }
+function beep(f,d,t='sine',v=.12){
+  try{
+    const ac=getAC(),o=ac.createOscillator(),g=ac.createGain();
+    o.connect(g);g.connect(ac.destination);
+    o.type=t;o.frequency.value=f;
+    g.gain.setValueAtTime(v,ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);
+    o.start();o.stop(ac.currentTime+d);
+  }catch(e){}
+}
+function sndCorrect(){ beep(523,.1,'sine',.15);setTimeout(()=>beep(659,.1,'sine',.12),100);setTimeout(()=>beep(784,.2,'sine',.1),200); }
+function sndWrong(){ beep(200,.15,'sawtooth',.12);setTimeout(()=>beep(150,.2,'sawtooth',.1),150); }
+function sndOpen(){ [392,494,587,784].forEach((f,i)=>setTimeout(()=>beep(f,.15,'sine',.1),i*80)); }
+function sndVictory(){ [523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>beep(f,.2,'sine',.12),i*120)); }
+function sndTick(){ beep(440,.05,'sine',.04); }
+
+// ── LEVEL CONFIG ──
+const LEVEL_CFG = {
+  1:{ label:'Nivel 1', desc:'Identificar fracciones en imágenes simples', rooms:5, timer:25, type:'identify' },
+  2:{ label:'Nivel 2', desc:'Fracciones equivalentes básicas', rooms:5, timer:20, type:'equivalent' },
+  3:{ label:'Nivel 3', desc:'Comparar fracciones · ¿cuál es mayor?', rooms:5, timer:18, type:'compare' },
+  4:{ label:'Nivel 4', desc:'Sumar fracciones con igual denominador', rooms:5, timer:15, type:'sum_same' },
+  5:{ label:'Nivel 5', desc:'Sumar fracciones con distinto denominador', rooms:5, timer:20, type:'sum_diff' },
+};
+
+let cfg={level:1};
+let state={room:0,lives:3,timerLeft:0,timerMax:0,interval:null,answered:false};
+let currentQ={};
+
+// ── SETUP ──
+document.querySelectorAll('.lv-btn').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('.lv-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); cfg.level=parseInt(b.dataset.lv);
+    document.getElementById('lv-desc').textContent=`${LEVEL_CFG[cfg.level].label} · ${LEVEL_CFG[cfg.level].desc}`;
+  };
+});
+document.getElementById('start-btn').onclick=()=>{
+  const name=document.getElementById('player-name').value.trim()||'Aventurero';
+  cfg.name=name; startGame();
+};
+document.getElementById('ans-num').addEventListener('keydown',e=>{ if(e.key==='Enter') checkAnswer(); });
+document.getElementById('ans-den').addEventListener('keydown',e=>{ if(e.key==='Enter') checkAnswer(); });
+document.getElementById('ans-single').addEventListener('keydown',e=>{ if(e.key==='Enter') checkAnswer(); });
+
+// ── GAME FLOW ──
+function startGame(){
+  state={room:0,lives:3,timerLeft:0,timerMax:0,interval:null,answered:false};
+  document.getElementById('setup').style.display='none';
+  document.getElementById('game').style.display='block';
+  document.getElementById('ov-victory').style.display='none';
+  document.getElementById('ov-gameover').style.display='none';
+  document.getElementById('lv-badge').textContent=LEVEL_CFG[cfg.level].label;
+  updateLives();
+  loadRoom();
+}
+
+function loadRoom(){
+  state.answered=false;
+  const lc=LEVEL_CFG[cfg.level];
+  document.getElementById('room-badge').textContent=`Habitación ${state.room+1} / ${lc.rooms}`;
+  document.getElementById('frac-room-txt').textContent=`PUERTA ${state.room+1}`;
+  document.getElementById('door').classList.remove('open');
+  document.getElementById('door-lock').textContent='🔒';
+  document.getElementById('door-lock').classList.remove('unlocked');
+  document.getElementById('guard').classList.remove('visible');
+  document.getElementById('character').style.left='15%';
+  document.getElementById('feedback').textContent='';
+  document.getElementById('feedback2').textContent='';
+  // reset door-lock style
+  document.getElementById('door-lock').style.borderColor='';
+
+  currentQ=genQuestion(lc.type, state.room);
+  renderQuestion(currentQ);
+  startTimer(lc.timer);
+}
+
+// ── QUESTION GENERATOR ──
+function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function gcd(a,b){ return b===0?a:gcd(b,a%b); }
+function simplify(n,d){ const g=gcd(n,d); return [n/g,d/g]; }
+
+function genQuestion(type, roomIdx){
+  if(type==='identify'){
+    const dens=[2,3,4,6,8];
+    const den=dens[rnd(0,dens.length-1)];
+    const num=rnd(1,den-1);
+    return { type:'identify', num, den,
+      ask:`¿Qué fracción está coloreada?`,
+      answerType:'fraction', correct:[num,den],
+      distractors: genDistractors(num,den)
+    };
+  }
+  if(type==='equivalent'){
+    const pairs=[[1,2],[1,3],[2,3],[1,4],[3,4],[2,4],[1,6],[2,6]];
+    const [n,d]=pairs[rnd(0,pairs.length-1)];
+    const mult=rnd(2,5);
+    const missing=rnd(0,1)===0?'num':'den';
+    return { type:'equivalent', n, d, mult, missing,
+      ask: missing==='num'
+        ? `<span class="frac-visual"><span class="num">${n}</span><span class="den">${d}</span></span> = <span class="frac-visual"><span class="num">?</span><span class="den">${d*mult}</span></span>`
+        : `<span class="frac-visual"><span class="num">${n}</span><span class="den">${d}</span></span> = <span class="frac-visual"><span class="num">${n*mult}</span><span class="den">?</span></span>`,
+      answerType:'single',
+      correct: missing==='num' ? n*mult : d*mult
+    };
+  }
+  if(type==='compare'){
+    const fracs=[[1,2],[1,3],[2,3],[1,4],[3,4],[2,5],[3,5],[1,6],[5,6]];
+    let a,b;
+    do{ a=fracs[rnd(0,fracs.length-1)]; b=fracs[rnd(0,fracs.length-1)]; }
+    while(a[0]/a[1]===b[0]/b[1]);
+    const aGtB=a[0]/a[1]>b[0]/b[1];
+    return { type:'compare', a, b,
+      ask:`¿Cuál fracción es mayor?`,
+      answerType:'choice',
+      options:[
+        { label:`${a[0]}/${a[1]}`, correct:aGtB },
+        { label:`${b[0]}/${b[1]}`, correct:!aGtB },
+        { label:'Son iguales', correct:false },
+        { label:'No se puede saber', correct:false },
+      ]
+    };
+  }
+  if(type==='sum_same'){
+    const den=rnd(2,8);
+    const n1=rnd(1,den-1); const n2=rnd(1,den-n1);
+    const [rn,rd]=simplify(n1+n2,den);
+    return { type:'sum_same', n1, n2, den,
+      ask:`<span class="frac-visual"><span class="num">${n1}</span><span class="den">${den}</span></span> + <span class="frac-visual"><span class="num">${n2}</span><span class="den">${den}</span></span> = ?`,
+      answerType:'fraction', correct:[rn,rd],
+      acceptAny:true, rawNum:n1+n2, rawDen:den
+    };
+  }
+  if(type==='sum_diff'){
+    const dens=[[2,3],[2,4],[2,6],[3,4],[3,6],[4,6]];
+    const [d1,d2]=dens[rnd(0,dens.length-1)];
+    const n1=rnd(1,d1-1); const n2=rnd(1,d2-1);
+    const lcd=d1*d2/gcd(d1,d2);
+    const sumN=n1*(lcd/d1)+n2*(lcd/d2);
+    const [rn,rd]=simplify(sumN,lcd);
+    return { type:'sum_diff', n1,d1,n2,d2,
+      ask:`<span class="frac-visual"><span class="num">${n1}</span><span class="den">${d1}</span></span> + <span class="frac-visual"><span class="num">${n2}</span><span class="den">${d2}</span></span> = ?`,
+      answerType:'fraction', correct:[rn,rd],
+      acceptAny:true, rawNum:sumN, rawDen:lcd
+    };
+  }
+}
+
+function genDistractors(num,den){
+  const opts=[{n:num,d:den,correct:true}];
+  const used=new Set([`${num}/${den}`]);
+  while(opts.length<4){
+    let n,d;
+    do{ d=rnd(2,8); n=rnd(1,d-1); }while(used.has(`${n}/${d}`));
+    used.add(`${n}/${d}`); opts.push({n,d,correct:false});
+  }
+  return opts.sort(()=>Math.random()-.5);
+}
+
+// ── RENDER ──
+function renderQuestion(q){
+  const imgWrap=document.getElementById('frac-img-wrap');
+  const qEl=document.getElementById('frac-question');
+  const optGrid=document.getElementById('options-grid');
+  const ansRow=document.getElementById('answer-row');
+  const singleRow=document.getElementById('single-row');
+  optGrid.style.display='none'; ansRow.style.display='none'; singleRow.style.display='none';
+  imgWrap.innerHTML=''; optGrid.innerHTML='';
+
+  if(q.type==='identify'){
+    // Draw fraction image
+    const wrap=document.createElement('div'); wrap.className='frac-img';
+    for(let i=0;i<q.den;i++){
+      const p=document.createElement('div');
+      p.className='frac-piece '+(i<q.num?'filled':'empty');
+      wrap.appendChild(p);
+    }
+    imgWrap.appendChild(wrap);
+    qEl.textContent=q.ask;
+    // Multiple choice
+    optGrid.style.display='grid';
+    q.distractors.forEach(opt=>{
+      const btn=document.createElement('button'); btn.className='opt-btn';
+      btn.innerHTML=`<span class="frac-visual"><span class="num">${opt.n}</span><span class="den">${opt.d}</span></span>`;
+      btn.onclick=()=>checkChoice(btn, opt.correct);
+      optGrid.appendChild(btn);
+    });
+  } else if(q.answerType==='choice'){
+    qEl.innerHTML=q.ask;
+    optGrid.style.display='grid';
+    q.options.forEach(opt=>{
+      const btn=document.createElement('button'); btn.className='opt-btn';
+      btn.textContent=opt.label;
+      btn.onclick=()=>checkChoice(btn, opt.correct);
+      optGrid.appendChild(btn);
+    });
+  } else if(q.answerType==='single'){
+    qEl.innerHTML=q.ask;
+    singleRow.style.display='flex';
+    document.getElementById('ans-single').value='';
+    document.getElementById('ok-single').disabled=false;
+    document.getElementById('ans-single').focus();
+  } else if(q.answerType==='fraction'){
+    qEl.innerHTML=q.ask;
+    ansRow.style.display='flex';
+    document.getElementById('ans-num').value='';
+    document.getElementById('ans-den').value='';
+    document.getElementById('ok-btn').disabled=false;
+    document.getElementById('ans-num').focus();
+  }
+}
+
+// ── ANSWER CHECK ──
+function checkChoice(btn, correct){
+  if(state.answered) return;
+  state.answered=true; stopTimer();
+  document.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);
+  if(correct){
+    btn.classList.add('correct'); sndCorrect();
+    openDoor();
+  } else {
+    btn.classList.add('wrong');
+    // show correct
+    document.querySelectorAll('.opt-btn').forEach(b=>{
+      const q=currentQ;
+      if(q.type==='compare'&&q.options){
+        const idx=[...document.querySelectorAll('.opt-btn')].indexOf(b);
+        if(q.options[idx]?.correct) b.classList.add('correct');
+      }
+      if(q.type==='identify'&&q.distractors){
+        const idx=[...document.querySelectorAll('.opt-btn')].indexOf(b);
+        if(q.distractors[idx]?.correct) b.classList.add('correct');
+      }
+    });
+    sndWrong(); wrongAnswer();
+  }
+}
+
+function checkAnswer(){
+  if(state.answered) return;
+  const q=currentQ;
+  let correct=false;
+  if(q.answerType==='single'){
+    const val=parseInt(document.getElementById('ans-single').value);
+    if(isNaN(val)) return;
+    correct=val===q.correct;
+    const fb=document.getElementById('feedback2');
+    fb.textContent=correct?'✓ ¡Correcto!':`✗ Era ${q.correct}`;
+    fb.className='feedback '+(correct?'ok':'fail');
+    document.getElementById('ok-single').disabled=true;
+  } else {
+    const num=parseInt(document.getElementById('ans-num').value);
+    const den=parseInt(document.getElementById('ans-den').value);
+    if(isNaN(num)||isNaN(den)||den===0) return;
+    const [cn,cd]=q.correct;
+    // Accept simplified or original
+    const [sn,sd]=simplify(num,den);
+    correct=(sn===cn&&sd===cd);
+    if(!correct&&q.acceptAny){
+      correct=(num===q.rawNum&&den===q.rawDen);
+    }
+    const fb=document.getElementById('feedback');
+    fb.textContent=correct?'✓ ¡Correcto!':`✗ Era ${cn}/${cd}`;
+    fb.className='feedback '+(correct?'ok':'fail');
+    document.getElementById('ok-btn').disabled=true;
+  }
+  state.answered=true; stopTimer();
+  if(correct){ sndCorrect(); openDoor(); }
+  else { sndWrong(); wrongAnswer(); }
+}
+
+function openDoor(){
+  const lock=document.getElementById('door-lock');
+  lock.textContent='🔓'; lock.classList.add('unlocked');
+  lock.style.borderColor='var(--green)';
+  sndOpen();
+  // Move character toward door
+  document.getElementById('character').style.left='42%';
+  setTimeout(()=>{
+    document.getElementById('door').classList.add('open');
+    document.getElementById('character').style.left='65%';
+    setTimeout(()=>{
+      state.room++;
+      if(state.room>=LEVEL_CFG[cfg.level].rooms) showVictory();
+      else flashTransition(()=>loadRoom());
+    },700);
+  },600);
+}
+
+function wrongAnswer(){
+  state.lives--;
+  updateLives();
+  document.getElementById('character').classList.add('shake');
+  setTimeout(()=>document.getElementById('character').classList.remove('shake'),500);
+  const guard=document.getElementById('guard');
+  guard.classList.add('visible');
+  setTimeout(()=>guard.classList.remove('visible'),1500);
+  if(state.lives<=0){ setTimeout(showGameOver,1200); return; }
+  setTimeout(()=>{ state.answered=false; loadRoom(); },1800);
+}
+
+// ── TIMER ──
+function startTimer(secs){
+  stopTimer();
+  state.timerLeft=secs; state.timerMax=secs;
+  updateTimerUI();
+  state.interval=setInterval(()=>{
+    state.timerLeft=Math.max(0,state.timerLeft-.1);
+    updateTimerUI();
+    if(state.timerLeft<=3) sndTick();
+    if(state.timerLeft<=0){ stopTimer(); if(!state.answered) timeOut(); }
+  },100);
+}
+function stopTimer(){ clearInterval(state.interval); }
+function updateTimerUI(){
+  const pct=(state.timerLeft/state.timerMax)*100;
+  const fill=document.getElementById('timer-fill');
+  fill.style.width=pct+'%';
+  fill.style.background=pct<30?'#c0392b':pct<60?'#f39c12':'#27ae60';
+  document.getElementById('timer-num').textContent=Math.ceil(state.timerLeft);
+}
+function timeOut(){
+  if(state.answered) return;
+  state.answered=true;
+  const fb=document.getElementById('feedback'); fb.textContent='⏰ ¡Tiempo!'; fb.className='feedback fail';
+  const fb2=document.getElementById('feedback2'); fb2.textContent='⏰ ¡Tiempo!'; fb2.className='feedback fail';
+  sndWrong(); wrongAnswer();
+}
+
+// ── LIVES ──
+function updateLives(){
+  ['h1','h2','h3'].forEach((id,i)=>{
+    document.getElementById(id).classList.toggle('lost',i>=state.lives);
+  });
+}
+
+// ── TRANSITIONS ──
+function flashTransition(cb){
+  const f=document.getElementById('room-flash');
+  f.classList.add('show');
+  setTimeout(()=>{ cb(); f.classList.remove('show'); },350);
+}
+
+// ── OVERLAYS ──
+function showVictory(){
+  stopTimer(); sndVictory();
+  const stars=state.lives===3?'⭐⭐⭐':state.lives===2?'⭐⭐':'⭐';
+  document.getElementById('ov-stars').textContent=stars;
+  const msgs={3:'¡Perfecto! Escapaste sin perder una vida.',2:'¡Muy bien! Escapaste con habilidad.',1:'¡Lo lograste! Pero el guardián estuvo cerca.'};
+  document.getElementById('ov-sub').textContent=msgs[state.lives]||'¡Escapaste!';
+  document.getElementById('ov-victory').style.display='flex';
+}
+function showGameOver(){
+  stopTimer();
+  document.getElementById('go-sub').textContent=`El guardián te atrapó en la habitación ${state.room+1}. ¿Lo intentas de nuevo?`;
+  document.getElementById('ov-gameover').style.display='flex';
+}
+function nextLevel(){
+  document.getElementById('ov-victory').style.display='none';
+  if(cfg.level<5){ cfg.level++; document.querySelectorAll('.lv-btn').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.lv)===cfg.level)); }
+  startGame();
+}
+function retryGame(){
+  document.getElementById('ov-gameover').style.display='none';
+  startGame();
+}
+function backToSetup(){
+  stopTimer();
+  document.getElementById('ov-victory').style.display='none';
+  document.getElementById('ov-gameover').style.display='none';
+  document.getElementById('game').style.display='none';
+  document.getElementById('setup').style.display='block';
+}
+</script>
+</body>
+</html>
