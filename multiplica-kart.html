@@ -346,14 +346,47 @@ const ALL_CHARS = [
 ];
 
 const EMOJIS = ['🍄','⭐','🐢','🔥','💎','🌸'];
+
+// Configuración pedagógica por grado y operación
 const GRADE_CFG = {
-  1:{range:[1,5],   label:'1° grado'},
-  2:{range:[1,10],  label:'2° grado'},
-  3:{range:[2,10],  label:'3° grado'},
-  4:{range:[2,12],  label:'4° grado'},
-  5:{range:[3,12],  label:'5° grado'},
-  6:{range:[4,12],  label:'6° grado'},
+  1:{ label:'1° grado',
+      sum: ()=>({ a:rnd(1,9),   b:rnd(1,9) }),
+      res: ()=>{ const a=rnd(1,9); return { a, b:rnd(1,a) }; },
+      mul: ()=>({ a:rnd(1,2),   b:rnd(1,10) }),
+      div: ()=>{ const b=rnd(1,5); return { a:b*rnd(1,5), b }; }
+  },
+  2:{ label:'2° grado',
+      sum: ()=>({ a:rnd(2,19),  b:rnd(2,10) }),
+      res: ()=>{ const a=rnd(5,20); return { a, b:rnd(1,a) }; },
+      mul: ()=>({ a:rnd(1,5),   b:rnd(1,10) }),
+      div: ()=>{ const b=rnd(1,5); return { a:b*rnd(2,8), b }; }
+  },
+  3:{ label:'3° grado',
+      sum: ()=>({ a:rnd(10,50), b:rnd(10,50) }),
+      res: ()=>{ const a=rnd(15,60); return { a, b:rnd(10,a) }; },
+      mul: ()=>({ a:rnd(2,7),   b:rnd(1,10) }),
+      div: ()=>{ const b=rnd(2,7); return { a:b*rnd(2,9), b }; }
+  },
+  4:{ label:'4° grado',
+      sum: ()=>({ a:rnd(10,90), b:rnd(10,90) }),
+      res: ()=>{ const a=rnd(20,99); return { a, b:rnd(10,a) }; },
+      mul: ()=>({ a:rnd(2,9),   b:rnd(1,12) }),
+      div: ()=>{ const b=rnd(2,9); return { a:b*rnd(3,11), b }; }
+  },
+  5:{ label:'5° grado',
+      sum: ()=>({ a:rnd(50,199), b:rnd(50,199) }),
+      res: ()=>{ const a=rnd(50,200); return { a, b:rnd(20,a) }; },
+      mul: ()=>({ a:rnd(3,12),  b:rnd(2,12) }),
+      div: ()=>{ const b=rnd(2,12); return { a:b*rnd(4,12), b }; }
+  },
+  6:{ label:'6° grado',
+      sum: ()=>({ a:rnd(100,499), b:rnd(100,499) }),
+      res: ()=>{ const a=rnd(100,500); return { a, b:rnd(50,a) }; },
+      mul: ()=>({ a:rnd(4,12),  b:rnd(4,12) }),
+      div: ()=>{ const b=rnd(3,12); return { a:b*rnd(5,15), b }; }
+  },
 };
+function rnd(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
 const OP_LABELS = {sum:'➕ Suma', res:'➖ Resta', mul:'✖️ Mult.', div:'➗ Div.'};
 const OP_SYMS   = {sum:'+', res:'−', mul:'×', div:'÷'};
 
@@ -605,12 +638,10 @@ function rollDice(){
   face.classList.add('rolling'); document.getElementById('roll-btn').disabled=true;
   let ticks=0;
   const iv=setInterval(()=>{
-    const r=GRADE_CFG[cfg.grade].range;
-    face.textContent=Math.floor(Math.random()*(r[1]-r[0]+1))+r[0]; ticks++;
+    face.textContent=rnd(1,12); ticks++;
     if(ticks>12){
       clearInterval(iv); face.classList.remove('rolling');
-      const r2=GRADE_CFG[cfg.grade].range;
-      currentB=Math.floor(Math.random()*(r2[1]-r2[0]+1))+r2[0];
+      // genQuestion ya fue llamado en nextTurn, solo mostramos currentB
       face.textContent=currentB; diceRolled=true; buildQuestion();
       document.getElementById('q-input').disabled=false; document.getElementById('q-ok').disabled=false;
       document.getElementById('q-input').focus(); startTimer();
@@ -619,19 +650,23 @@ function rollDice(){
 }
 
 // ── QUESTION ──
-function genA(){ const r=GRADE_CFG[cfg.grade].range; return Math.floor(Math.random()*(r[1]-r[0]+1))+r[0]; }
+function genQuestion(){
+  const g=GRADE_CFG[cfg.grade];
+  const pair=g[cfg.op]();
+  currentA=pair.a; currentB=pair.b;
+}
 function calcCorrect(){
   if(cfg.op==='sum') return currentA+currentB;
   if(cfg.op==='res') return currentA-currentB;
   if(cfg.op==='mul') return currentA*currentB;
-  return currentA;
+  return Math.round(currentA/currentB); // división exacta garantizada por genQuestion
 }
 function buildQuestion(){
   let q;
   if(cfg.op==='sum') q=`${currentA} ${OP_SYMS.sum} ${currentB} = ?`;
   else if(cfg.op==='res') q=`${currentA} ${OP_SYMS.res} ${currentB} = ?`;
   else if(cfg.op==='mul') q=`${currentA} ${OP_SYMS.mul} ${currentB} = ?`;
-  else q=`${currentA*currentB} ${OP_SYMS.div} ${currentB} = ?`;
+  else q=`${currentA} ${OP_SYMS.div} ${currentB} = ?`; // currentA ya es el dividendo
   document.getElementById('q-text').textContent=q;
   document.getElementById('q-fb').textContent=''; document.getElementById('q-fb').className='';
   document.getElementById('q-input').value='';
@@ -661,7 +696,7 @@ function nextTurn(){
   document.getElementById('roll-btn').disabled=false;
   document.getElementById('q-input').disabled=true; document.getElementById('q-ok').disabled=true;
   document.getElementById('q-text').textContent='🎲 Tira el dado primero';
-  document.getElementById('q-fb').textContent=''; diceRolled=false; currentA=genA(); stopTimer();
+  document.getElementById('q-fb').textContent=''; diceRolled=false; genQuestion(); stopTimer();
   document.querySelectorAll('.sc').forEach((c,i)=>c.classList.toggle('active',i===currentIdx));
   updateTokens();
 }
