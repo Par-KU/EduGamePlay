@@ -33,6 +33,8 @@ body{background:#111;display:flex;justify-content:center;align-items:flex-start;
 .char-opt img{width:34px;height:34px;object-fit:contain;image-rendering:pixelated;}
 .char-opt.selected{border-color:#facc15;background:rgba(250,204,21,.15);}
 .char-opt:active{opacity:.7;}
+.del-btn{width:32px;height:32px;border-radius:6px;border:1.5px solid rgba(248,113,113,.3);background:transparent;color:#f87171;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;-webkit-tap-highlight-color:transparent;align-self:flex-start;margin-top:6px;}
+.del-btn:active{background:rgba(248,113,113,.15);}
 .goal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
 #start-btn{width:100%;background:#7c3aed;color:#fff;border:none;border-radius:8px;font-size:clamp(16px,4vw,20px);font-family:'Courier New',monospace;font-weight:bold;padding:14px;cursor:pointer;border-bottom:4px solid #4c1d95;margin-top:8px;letter-spacing:1px;min-height:52px;-webkit-tap-highlight-color:transparent;}
 #start-btn:active{transform:translateY(2px);border-bottom-width:1px;}
@@ -335,7 +337,20 @@ document.getElementById('start-btn').onclick=()=>{
 function buildPlayerRow(i){
   const row=document.createElement('div'); row.className='player-row'; row.style.flexDirection='column'; row.style.alignItems='stretch';
   const top=document.createElement('div'); top.style.cssText='display:flex;gap:8px;align-items:center;';
-  top.innerHTML=`<span>${EMOJIS[i]}</span><input type="text" value="Jugador ${i+1}" autocomplete="off" style="flex:1;padding:10px;border-radius:6px;border:1.5px solid rgba(255,255,255,0.15);font-family:'Courier New',monospace;font-size:14px;background:rgba(255,255,255,0.05);color:#fff;outline:none;min-height:44px;"/>`;
+  const emoji=document.createElement('span'); emoji.textContent=EMOJIS[i];
+  const input=document.createElement('input');
+  input.type='text'; input.value=`Jugador ${i+1}`; input.autocomplete='off';
+  input.style.cssText='flex:1;padding:10px;border-radius:6px;border:1.5px solid rgba(255,255,255,0.15);font-family:\'Courier New\',monospace;font-size:14px;background:rgba(255,255,255,0.05);color:#fff;outline:none;min-height:44px;';
+  const delBtn=document.createElement('button'); delBtn.className='del-btn'; delBtn.textContent='✕';
+  delBtn.title='Eliminar jugador';
+  delBtn.onclick=()=>{
+    const list=document.getElementById('players-list');
+    if(list.children.length<=2){ delBtn.style.animation='shake .3s'; setTimeout(()=>delBtn.style.animation='',300); return; }
+    row.remove();
+    // Reasignar emojis
+    [...list.children].forEach((r,idx)=>{ const sp=r.querySelector('span'); if(sp) sp.textContent=EMOJIS[idx]; });
+  };
+  top.appendChild(emoji); top.appendChild(input); top.appendChild(delBtn);
   const picker=document.createElement('div'); picker.className='char-picker';
   ALL_CHARS.forEach((src,ci)=>{
     const opt=document.createElement('div'); opt.className='char-opt'+(ci===i?' selected':''); opt.dataset.src=src;
