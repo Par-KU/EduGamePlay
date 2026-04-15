@@ -123,27 +123,29 @@ body{background:#111;display:flex;flex-direction:column;align-items:center;min-h
 
 /* ── QUESTION PANEL ── */
 #qpanel{background:#0d0d1a;padding:clamp(10px,3vw,16px) clamp(12px,4vw,20px);border-top:2px solid #7c3aed;}
-#q-turn{color:#a78bfa;font-size:11px;letter-spacing:1px;margin-bottom:4px;}
-#q-text{color:#fff;font-size:clamp(20px,6vw,28px);font-weight:bold;text-shadow:2px 2px 0 #4c1d95;margin-bottom:10px;min-height:32px;}
-
-#dice-wrap{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-#dice-face{width:44px;height:44px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:bold;color:#333;border:2px solid #7c3aed;flex-shrink:0;overflow:hidden;max-width:44px;}
+#q-turn{color:#a78bfa;font-size:11px;letter-spacing:1px;margin-bottom:8px;}
+#q-text{color:#fff;font-size:clamp(20px,6vw,28px);font-weight:bold;text-shadow:2px 2px 0 #4c1d95;margin-bottom:12px;min-height:32px;}
+/* Fila única: dado | tirar | input | OK */
+#action-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+#dice-face{width:52px;height:52px;background:#1a1a2e;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:bold;color:#facc15;border:2px solid #7c3aed;flex-shrink:0;}
 #dice-face.rolling{animation:roll .5s;}
 @keyframes roll{0%,100%{transform:rotate(0)}25%{transform:rotate(-15deg)}75%{transform:rotate(15deg)}}
-#dice-lbl{color:#888;font-size:11px;line-height:1.4;}
-#roll-btn{background:transparent;border:1.5px solid #7c3aed;color:#a78bfa;border-radius:8px;font-family:'Courier New',monospace;font-size:clamp(13px,3.5vw,15px);padding:10px 16px;cursor:pointer;min-height:44px;-webkit-tap-highlight-color:transparent;}
+#roll-btn{background:#7c3aed;color:#fff;border:none;border-radius:8px;font-family:'Courier New',monospace;font-size:clamp(13px,3.5vw,15px);padding:10px 16px;cursor:pointer;min-height:52px;border-bottom:3px solid #4c1d95;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
 #roll-btn:disabled{opacity:.4;cursor:default;}
-#roll-btn:active:not(:disabled){background:rgba(124,58,237,.2);}
-
-.q-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
-#q-input{width:clamp(70px,20vw,90px);font-size:clamp(18px,5vw,22px);font-family:'Courier New',monospace;text-align:center;border:2px solid #7c3aed;border-radius:8px;background:#fff;color:#333;padding:8px 4px;outline:none;min-height:48px;}
-#q-ok{background:#7c3aed;color:#fff;border:none;border-radius:8px;font-size:clamp(14px,4vw,16px);font-family:'Courier New',monospace;font-weight:bold;padding:10px 20px;cursor:pointer;border-bottom:3px solid #4c1d95;min-height:48px;flex:1;max-width:120px;-webkit-tap-highlight-color:transparent;}
+#roll-btn:active:not(:disabled){transform:translateY(1px);border-bottom-width:1px;}
+#q-input{flex:1;min-width:70px;max-width:100px;font-size:clamp(18px,5vw,22px);font-family:'Courier New',monospace;text-align:center;border:2px solid rgba(255,255,255,.15);border-radius:8px;background:rgba(255,255,255,.06);color:#fff;padding:8px 4px;outline:none;min-height:52px;}
+#q-input:not(:disabled){border-color:#7c3aed;background:#fff;color:#333;}
+#q-input::placeholder{color:#444;}
+#q-ok{background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:clamp(14px,4vw,16px);font-family:'Courier New',monospace;font-weight:bold;padding:10px 20px;cursor:pointer;border-bottom:3px solid #14532d;min-height:52px;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
 #q-ok:active{transform:translateY(1px);border-bottom-width:1px;}
-#q-ok:disabled{opacity:.4;cursor:default;}
-#q-fb{font-size:clamp(11px,3vw,13px);font-weight:bold;flex:1;min-width:80px;}
+#q-ok:disabled{opacity:.4;cursor:default;background:#166534;}
+#q-fb{font-size:clamp(11px,3vw,13px);font-weight:bold;width:100%;margin-top:6px;}
 #q-fb.ok{color:#4ade80;}
 #q-fb.fail{color:#f87171;}
 #q-fb.special{color:#facc15;}
+/* ocultar elementos viejos que ya no se usan */
+#dice-wrap{display:none;}
+.q-row{display:none;}
 
 /* ── SCOREBOARD ── */
 #scoreboard{background:#0a0a18;padding:8px 12px;display:flex;gap:6px;overflow-x:auto;border-top:1px solid rgba(255,255,255,.06);-webkit-overflow-scrolling:touch;}
@@ -358,19 +360,14 @@ body{background:#111;display:flex;flex-direction:column;align-items:center;min-h
   </div>
   <div id="qpanel">
     <div id="q-turn">TURNO</div>
-    <div id="dice-wrap">
-      <div id="dice-face">?</div>
-      <div style="flex:1;">
-        <div id="dice-lbl">Tira el dado para el segundo número</div>
-        <button id="roll-btn" onclick="rollDice()" style="margin-top:6px;">🎲 Tirar dado</button>
-      </div>
-    </div>
     <div id="q-text">?</div>
-    <div class="q-row">
+    <div id="action-row">
+      <div id="dice-face">?</div>
+      <button id="roll-btn" onclick="rollDice()">🎲 Tirar dado</button>
       <input id="q-input" type="number" inputmode="numeric" pattern="[0-9]*" min="0" max="9999" placeholder="?" disabled autocomplete="off"/>
       <button id="q-ok" disabled onclick="checkAnswer()">OK ✓</button>
-      <div id="q-fb"></div>
     </div>
+    <div id="q-fb"></div>
   </div>
   <div id="scoreboard"></div>
 </div>
