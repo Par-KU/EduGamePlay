@@ -146,6 +146,15 @@ body{background:#111;display:flex;flex-direction:column;align-items:center;min-h
 /* ocultar elementos viejos que ya no se usan */
 #dice-wrap{display:none;}
 .q-row{display:none;}
+/* ── OPCIONES MÚLTIPLES ── */
+#opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.opt-btn{background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;font-family:'Courier New',monospace;font-size:clamp(16px,5vw,22px);font-weight:bold;padding:14px 8px;cursor:pointer;min-height:56px;transition:background .12s,border-color .12s,transform .1s;-webkit-tap-highlight-color:transparent;}
+.opt-btn:active:not(:disabled){transform:scale(.97);}
+.opt-btn:disabled{cursor:default;}
+.opt-btn.correct{background:rgba(74,222,128,.25);border-color:#4ade80;color:#4ade80;}
+.opt-btn.wrong{background:rgba(248,113,113,.2);border-color:#f87171;color:#f87171;}
+.opt-btn.reveal{background:rgba(74,222,128,.15);border-color:#4ade80;color:#4ade80;}
+@media(min-width:720px){#opts-grid{grid-template-columns:repeat(4,1fr);}.opt-btn{font-size:20px;}}
 
 /* ── SCOREBOARD ── */
 #scoreboard{background:#0a0a18;padding:8px 12px;display:flex;gap:6px;overflow-x:auto;border-top:1px solid rgba(255,255,255,.06);-webkit-overflow-scrolling:touch;}
@@ -364,9 +373,8 @@ body{background:#111;display:flex;flex-direction:column;align-items:center;min-h
     <div id="action-row">
       <div id="dice-face">?</div>
       <button id="roll-btn" onclick="rollDice()">🎲 Tirar dado</button>
-      <input id="q-input" type="number" inputmode="numeric" pattern="[0-9]*" min="0" max="9999" placeholder="?" disabled autocomplete="off"/>
-      <button id="q-ok" disabled onclick="checkAnswer()">OK ✓</button>
     </div>
+    <div id="opts-grid"></div>
     <div id="q-fb"></div>
   </div>
   <div id="scoreboard"></div>
@@ -544,7 +552,7 @@ function buildPlayerRow(i){
   return row;
 }
 
-document.getElementById('q-input').addEventListener('keydown',e=>{ if(e.key==='Enter') checkAnswer(); });
+// Enter ya no aplica — se usan botones de opción múltiple
 
 // ── SPECIAL TILES DINÁMICOS ──
 const STATIC_TILES  = [];
@@ -719,15 +727,15 @@ function timeOut(){
   const correct=calcCorrect();
   const fb=document.getElementById('q-fb');
   fb.textContent=`⏰ ¡Tiempo! Era ${correct}`; fb.className='fail';
-  document.getElementById('q-input').disabled=true; document.getElementById('q-ok').disabled=true;
-  setTimeout(advanceTurn,1200);
+  document.querySelectorAll('.opt-btn').forEach(b=>{ b.disabled=true; if(parseInt(b.textContent)===correct) b.classList.add('reveal'); });
+  setTimeout(advanceTurn,1400);
 }
 
 // ── DICE ──
 function rollDice(){
   soundDice();
   const face=document.getElementById('dice-face');
-  face.textContent='?'; // limpiar valor anterior
+  face.textContent='?';
   face.classList.add('rolling'); document.getElementById('roll-btn').disabled=true;
   let ticks=0;
   const iv=setInterval(()=>{
@@ -735,9 +743,7 @@ function rollDice(){
     if(ticks>12){
       clearInterval(iv); face.classList.remove('rolling');
       face.textContent=rnd(1,6);
-      diceRolled=true; buildQuestion();
-      document.getElementById('q-input').disabled=false; document.getElementById('q-ok').disabled=false;
-      document.getElementById('q-input').focus(); startTimer();
+      diceRolled=true; buildQuestion(); startTimer();
     }
   },60);
 }
@@ -752,17 +758,88 @@ function calcCorrect(){
   if(cfg.op==='sum') return currentA+currentB;
   if(cfg.op==='res') return currentA-currentB;
   if(cfg.op==='mul') return currentA*currentB;
-  return Math.round(currentA/currentB); // división exacta garantizada por genQuestion
+  return Math.round(currentA/currentB);
+}
+function genDistractors(correct){
+  const set=new Set([correct]);
+  const opts=[];
+  // Variaciones inteligentes según la operación
+  const deltas=cfg.op==='mul'
+    ? [correct-currentA, correct+currentA, correct-currentB, correct+currentB, correct-2, correct+2, correct+currentA-1, correct-currentB+1]
+    : [correct-1, correct+1, correct-2, correct+2, correct-5, correct+5, correct-10, correct+10];
+  for(const d of deltas){
+    if(d>0 && !set.has(d)){ set.add(d); opts.push(d); }
+    if(opts.length>=3) break;
+  }
+  // Relleno si faltan
+  let tries=0;
+  while(opts.length<3 && tries<30){
+    const v=correct+rnd(-Math.max(3,Math.floor(correct*.3)),Math.max(3,Math.floor(correct*.3)));
+    if(v>0 && !set.has(v)){ set.add(v); opts.push(v); }
+    tries++;
+  }
+  // Mezclar las 4 opciones (correcta + 3 distractores)
+  const all=[correct,...opts.slice(0,3)];
+  for(let i=all.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [all[i],all[j]]=[all[j],all[i]]; }
+  return all;
 }
 function buildQuestion(){
   let q;
   if(cfg.op==='sum') q=`${currentA} ${OP_SYMS.sum} ${currentB} = ?`;
   else if(cfg.op==='res') q=`${currentA} ${OP_SYMS.res} ${currentB} = ?`;
   else if(cfg.op==='mul') q=`${currentA} ${OP_SYMS.mul} ${currentB} = ?`;
-  else q=`${currentA} ${OP_SYMS.div} ${currentB} = ?`; // currentA ya es el dividendo
+  else q=`${currentA} ${OP_SYMS.div} ${currentB} = ?`;
   document.getElementById('q-text').textContent=q;
-  document.getElementById('q-fb').textContent=''; document.getElementById('q-fb').className='';
-  document.getElementById('q-input').value='';
+  document.getElementById('q-fb').textContent='';
+  document.getElementById('q-fb').className='';
+  // Construir grid de 4 opciones
+  const correct=calcCorrect();
+  const options=genDistractors(correct);
+  const grid=document.getElementById('opts-grid');
+  grid.innerHTML='';
+  options.forEach(val=>{
+    const btn=document.createElement('button');
+    btn.className='opt-btn';
+    btn.textContent=val;
+    btn.onclick=()=>selectOption(btn, val, correct);
+    grid.appendChild(btn);
+  });
+}
+function selectOption(btn, val, correct){
+  if(!diceRolled) return;
+  stopTimer();
+  // Deshabilitar todos
+  document.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);
+  const p=players[currentIdx];
+  const tok=document.getElementById('tok-'+currentIdx);
+  const fb=document.getElementById('q-fb');
+  if(val===correct){
+    btn.classList.add('correct');
+    soundCoin(); p.pos=Math.min(p.pos+1,cfg.goal);
+    tok.classList.add('bounce'); setTimeout(()=>tok.classList.remove('bounce'),500);
+    const tile=specialTiles.find(t=>Math.abs(t.pos-p.pos)<=1&&(t.laneIdx===undefined||t.laneIdx===currentIdx));
+    if(tile){
+      soundSpecial(); let msg='';
+      if(tile.type==='⭐'){ p.pos=Math.min(p.pos+2,cfg.goal); msg='⭐ ¡ESTRELLA! +2 casillas'; }
+      else if(tile.type==='🍄'){ msg='🍄 ¡HONGO ROJO! Turno extra'; }
+      else if(tile.type==='🍀'){ p.pos=Math.min(p.pos+3,cfg.goal); msg='🍀 ¡HONGO VERDE! +3 y turno extra'; removeTile(tile); soundFanfare(); }
+      else if(tile.type==='💣'){ const back=1+Math.floor(Math.random()*3); p.pos=Math.max(p.pos-back,0); msg=`💣 ¡BOMBA! Retrocedes ${back}`; explodeBomb(tile); }
+      else if(tile.type==='🐢'){ const back=1+Math.floor(Math.random()*2); p.pos=Math.max(p.pos-back,0); msg=`🐢 ¡CAPARAZÓN! Retrocedes ${back}`; removeTile(tile); beep(300,.2,'square',.1); }
+      else if(tile.type==='☁️'){ p.frozen=true; msg='☁️ ¡NUBE! Pierdes el próximo turno'; removeTile(tile); const badge=document.createElement('div'); badge.className='frozen-badge'; badge.textContent='❄️ Congelado'; tok.appendChild(badge); beep(800,.3,'sine',.08); }
+      fb.textContent=msg; fb.className='special'; showTilePopup(msg);
+      if(tile.type==='🍄'||tile.type==='🍀'){ updateTokens(); checkFinish(p); setTimeout(()=>{ if(p.finished) advanceTurn(); else nextTurn(); },1400); return; }
+    } else { fb.textContent='✓ ¡Correcto! +1 casilla'; fb.className='ok'; }
+    updateTokens(); checkFinish(p);
+    if(p.finished){ setTimeout(advanceTurn,800); return; }
+    setTimeout(advanceTurn,1200);
+  } else {
+    btn.classList.add('wrong');
+    // Revelar la correcta
+    document.querySelectorAll('.opt-btn').forEach(b=>{ if(parseInt(b.textContent)===correct) b.classList.add('reveal'); });
+    soundWrong(); tok.classList.add('shake'); setTimeout(()=>tok.classList.remove('shake'),500);
+    fb.textContent=`✗ Era ${correct}`; fb.className='fail';
+    setTimeout(advanceTurn,1400);
+  }
 }
 function nextTurn(){
   let tries=0;
@@ -786,75 +863,13 @@ function nextTurn(){
   document.getElementById('turn-lbl').textContent='Turno: '+p.emoji+' '+p.name;
   document.getElementById('q-turn').textContent=`🎮 LE TOCA A ${p.name.toUpperCase()}`;
   document.getElementById('dice-face').textContent='?';
-  document.getElementById('dice-face').style.fontSize='22px';
+  document.getElementById('dice-face').style.fontSize='24px';
   document.getElementById('roll-btn').disabled=false;
-  document.getElementById('q-input').disabled=true; document.getElementById('q-ok').disabled=true;
+  document.getElementById('opts-grid').innerHTML='';
   document.getElementById('q-text').textContent='🎲 Tira el dado primero';
   document.getElementById('q-fb').textContent=''; diceRolled=false; genQuestion(); stopTimer();
   document.querySelectorAll('.sc').forEach((c,i)=>c.classList.toggle('active',i===currentIdx));
   updateTokens();
-}
-function checkAnswer(){
-  if(!diceRolled) return;
-  stopTimer();
-  const val=parseInt(document.getElementById('q-input').value);
-  const correct=calcCorrect();
-  if(isNaN(val)){ document.getElementById('q-input').focus(); return; }
-  document.getElementById('q-input').disabled=true; document.getElementById('q-ok').disabled=true;
-  const p=players[currentIdx];
-  const tok=document.getElementById('tok-'+currentIdx);
-  const fb=document.getElementById('q-fb');
-  if(val===correct){
-    soundCoin(); p.pos=Math.min(p.pos+1,cfg.goal);
-    tok.classList.add('bounce'); setTimeout(()=>tok.classList.remove('bounce'),500);
-    const tile=specialTiles.find(t=>Math.abs(t.pos-p.pos)<=1 && (t.laneIdx===undefined || t.laneIdx===currentIdx));
-    if(tile){
-      soundSpecial(); let msg='';
-      if(tile.type==='⭐'){
-        p.pos=Math.min(p.pos+2,cfg.goal); msg='⭐ ¡ESTRELLA! +2 casillas';
-      } else if(tile.type==='🍄'){
-        msg='🍄 ¡HONGO ROJO! Turno extra';
-      } else if(tile.type==='🍀'){
-        p.pos=Math.min(p.pos+3,cfg.goal);
-        msg='🍀 ¡HONGO VERDE! +3 casillas y turno extra';
-        removeTile(tile);
-        soundFanfare();
-      } else if(tile.type==='💣'){
-        const back=1+Math.floor(Math.random()*3);
-        p.pos=Math.max(p.pos-back,0);
-        msg=`💣 ¡BOMBA! Retrocedes ${back}`;
-        explodeBomb(tile);
-      } else if(tile.type==='🐢'){
-        const back=1+Math.floor(Math.random()*2);
-        p.pos=Math.max(p.pos-back,0);
-        msg=`🐢 ¡CAPARAZÓN! Retrocedes ${back}`;
-        removeTile(tile);
-        beep(300,.2,'square',.1);
-      } else if(tile.type==='☁️'){
-        p.frozen=true;
-        msg='☁️ ¡NUBE! Pierdes el próximo turno';
-        removeTile(tile);
-        // Badge visual en el token
-        const badge=document.createElement('div'); badge.className='frozen-badge'; badge.textContent='❄️ Congelado';
-        tok.appendChild(badge);
-        beep(800,.3,'sine',.08);
-      }
-      fb.textContent=msg; fb.className='special'; showTilePopup(msg);
-      if(tile.type==='🍄'||tile.type==='🍀'){
-        updateTokens();
-        checkFinish(p);
-        setTimeout(()=>{ if(p.finished) advanceTurn(); else nextTurn(); },1400);
-        return;
-      }
-    } else { fb.textContent='✓ ¡Correcto! +1 casilla'; fb.className='ok'; }
-    updateTokens(); checkFinish(p);
-    if(p.finished){ setTimeout(advanceTurn,800); return; }
-    setTimeout(advanceTurn,1200);
-  } else {
-    soundWrong(); tok.classList.add('shake'); setTimeout(()=>tok.classList.remove('shake'),500);
-    fb.textContent=`✗ Era ${correct}`; fb.className='fail';
-    setTimeout(advanceTurn,1200);
-  }
 }
 function checkFinish(p){
   if(p.pos>=cfg.goal&&!p.finished){
