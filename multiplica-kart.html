@@ -80,8 +80,8 @@ body{background:#111;display:flex;justify-content:center;align-items:flex-start;
 /* Lanes exactamente sobre la pista — entre línea de salida y FINAL */
 #lanes-el{
   position:absolute;
-  top:35%;bottom:12%;
-  left:0%;right:0%;
+  top:50%;bottom:6%;
+  left:6%;right:5%;
   z-index:2;
 }
 .lane{position:absolute;left:0;right:0;}
@@ -322,6 +322,8 @@ body{background:#111;display:flex;justify-content:center;align-items:flex-start;
 <!-- GAME -->
 <div id="game">
   <div id="track-wrap">
+    <img src="assets/chars/nubeinicio.gif" id="nube-inicio" style="position:absolute;top:2%;left:3%;width:clamp(40px,7vw,70px);z-index:10;pointer-events:none;"/>
+    <img src="assets/chars/nube final.gif" id="nube-final" style="position:absolute;top:2%;right:1%;width:clamp(40px,7vw,70px);z-index:10;pointer-events:none;"/>
     <div id="track">
       <div class="t-start"></div>
       <div id="lanes-el"></div>
@@ -370,16 +372,18 @@ body{background:#111;display:flex;justify-content:center;align-items:flex-start;
 </div>
 
 <script>
-const ALL_CHARS = [
-  'assets/chars/mario.gif',
-  'assets/chars/luigi.gif',
-  'assets/chars/princesstoadstool.gif',
-  'assets/chars/yoshi.gif',
-  'assets/chars/donkeykong.gif',
-  'assets/chars/bowser.gif',
-  'assets/chars/koopatroopasmall.gif',
-  'assets/chars/honguito.gif',
+// GIFs para la PISTA (terminan en car) y su equivalente para el PODIO
+const CHARS = [
+  { car:'assets/chars/mariocar.gif',              podio:'assets/chars/mario.gif' },
+  { car:'assets/chars/luiguicar.gif',             podio:'assets/chars/luigi.gif' },
+  { car:'assets/chars/yoshicar.gif',              podio:'assets/chars/yoshi.gif' },
+  { car:'assets/chars/bowsercar.gif',             podio:'assets/chars/bowser.gif' },
+  { car:'assets/chars/donkeykongcar.gif',         podio:'assets/chars/donkeykong.gif' },
+  { car:'assets/chars/honguitocar.gif',           podio:'assets/chars/honguito.gif' },
+  { car:'assets/chars/koopatroopasmallcar.gif',   podio:'assets/chars/koopatroopasmall.gif' },
+  { car:'assets/chars/princesstoadstoolcar.gif',  podio:'assets/chars/princesstoadstool.gif' },
 ];
+const ALL_CHARS = CHARS; // alias para buildPlayerRow
 
 const EMOJIS = ['🍄','⭐','🐢','🔥','💎','🌸'];
 
@@ -477,12 +481,18 @@ document.getElementById('add-btn').onclick=()=>{
 };
 document.getElementById('start-btn').onclick=()=>{
   const rows=[...document.querySelectorAll('#players-list .player-row')];
-  players=rows.map((row,i)=>({
-    name: row.querySelector('input').value.trim()||`Jugador ${i+1}`,
-    emoji: EMOJIS[i],
-    img: row.querySelector('.char-opt.selected')?.dataset.src || null,
-    pos:0, finished:false, finishOrder:null
-  }));
+  players=rows.map((row,i)=>{
+    const selectedOpt=row.querySelector('.char-opt.selected');
+    const charIdx=selectedOpt ? parseInt(selectedOpt.dataset.idx) : i;
+    const char=CHARS[charIdx]||CHARS[0];
+    return {
+      name: row.querySelector('input').value.trim()||`Jugador ${i+1}`,
+      emoji: EMOJIS[i],
+      img: char.car,        // GIF para la pista
+      imgPodio: char.podio, // GIF para el podio
+      pos:0, finished:false, finishOrder:null
+    };
+  });
   if(players.length<2){ alert('Mínimo 2 jugadores'); return; }
   initGame();
 };
@@ -500,14 +510,15 @@ function buildPlayerRow(i){
     const list=document.getElementById('players-list');
     if(list.children.length<=2){ delBtn.style.animation='shake .3s'; setTimeout(()=>delBtn.style.animation='',300); return; }
     row.remove();
-    // Reasignar emojis
     [...list.children].forEach((r,idx)=>{ const sp=r.querySelector('span'); if(sp) sp.textContent=EMOJIS[idx]; });
   };
   top.appendChild(emoji); top.appendChild(input); top.appendChild(delBtn);
   const picker=document.createElement('div'); picker.className='char-picker';
-  ALL_CHARS.forEach((src,ci)=>{
-    const opt=document.createElement('div'); opt.className='char-opt'+(ci===i?' selected':''); opt.dataset.src=src;
-    opt.innerHTML=`<img src="${src}" alt="char"/>`;
+  CHARS.forEach((ch,ci)=>{
+    const opt=document.createElement('div');
+    opt.className='char-opt'+(ci===i?' selected':'');
+    opt.dataset.idx=ci; // guardamos índice para recuperar ambos GIFs
+    opt.innerHTML=`<img src="${ch.car}" alt="char"/>`; // preview con el car.gif
     opt.onclick=()=>{
       picker.querySelectorAll('.char-opt').forEach(x=>x.classList.remove('selected'));
       opt.classList.add('selected');
@@ -855,8 +866,12 @@ function showPodium(){
   [1,0,2].forEach(rank=>{
     const p=sorted[rank]; if(!p) return;
     const col=document.createElement('div'); col.className='p-col';
-    const ico = p.img
-      ? `<img src="${p.img}" style="width:48px;height:48px;object-fit:contain;image-rendering:pixelated;"/>`
+    const gifSrc=p.imgPodio||p.img;
+    const ico=gifSrc
+      ? `<div style="position:relative;display:inline-block;">
+           <img src="${gifSrc}" style="width:56px;height:56px;object-fit:contain;image-rendering:pixelated;"/>
+           <img src="assets/chars/confeti.gif" style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:72px;height:62px;object-fit:cover;pointer-events:none;opacity:.9;"/>
+         </div>`
       : p.emoji;
     col.innerHTML=`<div class="p-ico">${ico}</div><div class="p-name">${p.name}</div><div class="p-block ${hs[rank]}">${medals[rank]||rank+1}</div>`;
     pod.appendChild(col);
