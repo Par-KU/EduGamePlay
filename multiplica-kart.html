@@ -63,62 +63,27 @@ body{background:#111;display:flex;justify-content:center;align-items:flex-start;
   background:#f5d87a;
   padding:0;position:relative;overflow:hidden;
 }
-/* Zigzag que separa cielo y pista */
-#track-wrap::after{
-  content:'';position:absolute;left:0;right:0;
-  bottom:0;height:22px;
-  background:
-    linear-gradient(135deg,#f5d87a 25%,transparent 25%) -10px 0,
-    linear-gradient(225deg,#f5d87a 25%,transparent 25%) -10px 0,
-    linear-gradient(315deg,#f5d87a 25%,transparent 25%),
-    linear-gradient(45deg, #f5d87a 25%,transparent 25%);
-  background-size:20px 20px;
-  background-color:#7bc442;
-  pointer-events:none;z-index:1;
-}
+#track-wrap::after{display:none;}
 .clouds{display:none;}
 #track{
   position:relative;
   height:clamp(200px,45vw,500px);
   overflow:hidden;
-  background:url('assets/bg/pista.png') center/cover no-repeat;
-  border-top:4px solid #5a9e2e;
-  margin-top:28px;
+  background:url('assets/bg/pista.png') top center/cover no-repeat;
+  margin-top:0;
+  border:none;
 }
-/* Línea de salida a cuadros */
-.t-start{
-  position:absolute;left:40px;top:0;bottom:0;width:20px;
-  background:repeating-conic-gradient(#000 0% 25%,#fff 0% 50%) 0 0/10px 10px;
-  z-index:6;
+.t-start{display:none;}
+.t-finish{display:none;}
+#track::before{display:none;}
+#track::after{display:none;}
+/* Lanes en la mitad inferior de la pista donde está el circuito verde */
+#lanes-el{
+  position:absolute;
+  top:52%;bottom:8%;
+  left:12%;right:4%;
+  z-index:2;
 }
-/* FINISH a cuadros */
-.t-finish{
-  position:absolute;right:0;top:0;bottom:0;width:28px;
-  background:repeating-conic-gradient(#000 0% 25%,#fff 0% 50%) 0 0/10px 10px;
-  display:flex;align-items:center;justify-content:center;z-index:6;
-}
-.t-finish::after{
-  content:'FINISH';
-  writing-mode:vertical-rl;
-  font-size:10px;font-weight:bold;
-  color:#e74c3c;
-  text-shadow:1px 1px 0 #fff;
-  letter-spacing:2px;
-  background:rgba(255,255,255,.7);
-  padding:2px;
-}
-/* Pasto decorativo en los bordes de la pista */
-#track::before{
-  content:'';position:absolute;
-  left:0;right:0;top:0;height:10px;
-  background:#5a9e2e;z-index:1;
-}
-#track::after{
-  content:'';position:absolute;
-  left:0;right:0;bottom:0;height:10px;
-  background:#5a9e2e;z-index:1;
-}
-#lanes-el{position:absolute;inset:10px;left:64px;right:32px;z-index:2;}
 .lane{position:absolute;left:0;right:0;}
 .token{position:absolute;font-size:clamp(28px,6vw,42px);transition:left .5s ease;filter:drop-shadow(1px 2px 0 rgba(0,0,0,.5));z-index:5;}
 .token img{width:clamp(36px,8vw,52px);height:clamp(36px,8vw,52px);object-fit:contain;image-rendering:pixelated;}
