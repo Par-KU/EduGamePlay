@@ -10,6 +10,7 @@ gtag("js",new Date());
 gtag("config","G-09YP073NX2");
 </script>
 <meta charset="UTF-8"/>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
 <title>Multiplica Kart — EduGamePlay</title>
 <style>
@@ -197,13 +198,15 @@ body{background:#111;display:flex;flex-direction:column;align-items:center;min-h
 .back-link{display:block;text-align:center;padding:10px;color:#666;font-size:12px;text-decoration:none;border-top:1px solid rgba(255,255,255,.05);}
 .back-link:active{color:#a78bfa;}
 
-.footer-game{text-align:center;padding:20px 16px;border-top:1px solid rgba(255,255,255,.08);color:#666;font-size:12px;line-height:1.8;background:#0a0a18;}
-.footer-game-brand{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:30px;padding:6px 16px;margin:6px 0;}
-.footer-game-name{font-family:'Courier New',monospace;font-size:13px;font-weight:bold;color:#facc15;}
-.footer-game-ver{font-size:10px;background:rgba(167,139,250,.15);color:#a78bfa;border:1px solid rgba(167,139,250,.3);border-radius:10px;padding:2px 7px;font-weight:700;letter-spacing:1px;}
-.footer-game-dev{font-size:11px;color:#666;}
-.footer-game-dev strong{color:#aaa;font-weight:600;}
-.footer-game-copy{font-size:10px;color:#555;margin-top:2px;letter-spacing:.5px;}
+.footer-game{text-align:center;padding:28px 16px 20px;border-top:1px solid rgba(255,255,255,.07);color:#6b6b8a;font-family:'Nunito',sans-serif;font-size:12px;line-height:1.8;background:#0e0e1a;width:100%;}
+.footer-game .footer-main{margin-bottom:10px;color:#6b6b8a;}
+.footer-game .footer-main span{color:#a78bfa;}
+.footer-game-brand{display:inline-flex;align-items:center;gap:10px;background:#16162a;border:1px solid rgba(255,255,255,.07);border-radius:30px;padding:8px 20px;margin-bottom:10px;}
+.footer-game-name{font-family:'Fredoka One',cursive;font-size:15px;background:linear-gradient(135deg,#facc15,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.5px;}
+.footer-game-ver{font-size:10px;background:rgba(167,139,250,.15);color:#a78bfa;border:1px solid rgba(167,139,250,.3);border-radius:10px;padding:2px 8px;font-weight:700;letter-spacing:1px;}
+.footer-game-dev{font-size:11px;color:#6b6b8a;}
+.footer-game-dev strong{color:#f1f0e8;font-weight:600;}
+.footer-game-copy{font-size:10px;color:#6b6b8a;opacity:.6;margin-top:4px;letter-spacing:.5px;}
 </style>
 </head>
 <body>
@@ -931,8 +934,8 @@ list.appendChild(buildPlayerRow(1));
 </script>
 
 </div>
-<div class="footer-game" style="width:100%;max-width:900px;margin-top:0;">
-  <div>Hecho con ❤️ para el salón de clases · HTML puro · Sin instalación · Gratis</div>
+<div class="footer-game">
+  <div class="footer-main">Hecho con ❤️ para el salón de clases · <span>HTML puro · Sin instalación · Gratis</span></div>
   <div class="footer-game-brand">
     <span class="footer-game-name">EduGamePlay</span>
     <span class="footer-game-ver">v 0.1</span>
