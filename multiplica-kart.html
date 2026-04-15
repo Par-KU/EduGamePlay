@@ -14,7 +14,7 @@ gtag("config","G-09YP073NX2");
 <title>Multiplica Kart — EduGamePlay</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:#111;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:12px;}
+body{background:#111;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:12px;}
 #app{font-family:'Courier New',monospace;background:#1a1a2e;border-radius:12px;overflow:hidden;width:100%;max-width:900px;}
 
 /* Desktop layout — mejoras visuales cuando hay más espacio */
@@ -87,8 +87,8 @@ body{background:#111;display:flex;justify-content:center;align-items:flex-start;
 /* Lanes exactamente sobre la pista — entre línea de salida y FINAL */
 #lanes-el{
   position:absolute;
-  top:50%;bottom:6%;
-  left:6%;right:5%;
+  top:33%;bottom:11%;
+  left:0%;right:0%;
   z-index:2;
 }
 .lane{position:absolute;left:0;right:0;}
@@ -930,7 +930,8 @@ list.appendChild(buildPlayerRow(0));
 list.appendChild(buildPlayerRow(1));
 </script>
 
-<div class="footer-game">
+</div>
+<div class="footer-game" style="width:100%;max-width:900px;margin-top:0;">
   <div>Hecho con ❤️ para el salón de clases · HTML puro · Sin instalación · Gratis</div>
   <div class="footer-game-brand">
     <span class="footer-game-name">EduGamePlay</span>
@@ -939,5 +940,6 @@ list.appendChild(buildPlayerRow(1));
   <div class="footer-game-dev">Desarrollado por <strong>Juan Pariona</strong></div>
   <div class="footer-game-copy">© 2026 Juan Pariona · Todos los derechos reservados</div>
 </div>
+
 </body>
 </html>
