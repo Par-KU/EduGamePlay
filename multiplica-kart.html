@@ -20,16 +20,12 @@ body{background:#111;display:flex;flex-direction:column;align-items:center;min-h
 
 /* Desktop layout — mejoras visuales cuando hay más espacio */
 @media(min-width:720px){
-  #game{display:grid !important;grid-template-columns:1fr 380px;grid-template-rows:auto auto auto;grid-template-areas:'track track' 'hud hud' 'timerbar timerbar' 'qpanel scoreboard';}
-  #track-wrap{grid-area:track;}
-  #timer-bar-wrap{grid-area:timerbar;}
-  #hud{grid-area:hud;}
-  #qpanel{grid-area:qpanel;border-right:1px solid rgba(255,255,255,.06);border-top:2px solid #7c3aed;}
-  #scoreboard{grid-area:scoreboard;flex-direction:column;overflow-y:auto;overflow-x:hidden;border-top:2px solid rgba(255,255,255,.06);padding:12px;justify-content:center;}
-  .sc{min-width:auto;width:100%;}
   .setup-title{font-size:26px;}
   .op-grid{grid-template-columns:repeat(4,1fr);}
+  #qpanel{padding:18px 28px;max-width:680px;margin:0 auto;width:100%;}
   #q-text{font-size:32px;}
+  #scoreboard{padding:10px 20px;gap:12px;justify-content:center;}
+  .sc{min-width:90px;padding:8px 14px;}
   .sc-ico{font-size:22px;}
   .sc-name{font-size:12px;max-width:90px;}
   .sc-pos{font-size:12px;}
