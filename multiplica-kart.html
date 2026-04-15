@@ -77,11 +77,11 @@ body{background:#111;display:flex;justify-content:center;align-items:flex-start;
 .t-finish{display:none;}
 #track::before{display:none;}
 #track::after{display:none;}
-/* Lanes en la mitad inferior de la pista donde está el circuito verde */
+/* Lanes exactamente sobre la pista — entre línea de salida y FINAL */
 #lanes-el{
   position:absolute;
-  top:52%;bottom:8%;
-  left:12%;right:4%;
+  top:50%;bottom:6%;
+  left:6%;right:5%;
   z-index:2;
 }
 .lane{position:absolute;left:0;right:0;}
@@ -541,11 +541,30 @@ function drawSpecialTiles(){
 
 function spawnTileEl(t,tw){
   tw=tw||document.getElementById('lanes-el').offsetWidth||300;
+  const lanesEl=document.getElementById('lanes-el');
+  const trackEl=document.getElementById('track');
   const el=document.createElement('div'); el.className='special-tile';
-  // Forzar variante emoji colorida para 🍀
   el.textContent = t.type==='🍀' ? '🍀\uFE0F' : t.type;
-  el.style.left=((t.pos/cfg.goal)*tw+4)+'px';
-  document.getElementById('track').appendChild(el);
+
+  // Posición X basada en posición en la pista
+  const xPct=(t.pos/cfg.goal)*100;
+  el.style.left=xPct+'%';
+
+  // Posición Y — sobre un carril aleatorio de los jugadores activos
+  const activePlayers=players.filter(p=>!p.finished);
+  const laneCount=players.length;
+  const laneIdx=t.laneIdx!==undefined ? t.laneIdx : Math.floor(Math.random()*laneCount);
+  t.laneIdx=laneIdx;
+
+  // Calcular top relativo al track (no al lanes-el)
+  const lanesRect=lanesEl.getBoundingClientRect();
+  const trackRect=trackEl.getBoundingClientRect();
+  const laneH=lanesRect.height/laneCount;
+  const laneTop=lanesRect.top - trackRect.top + laneIdx*laneH + laneH/2 - 12;
+  el.style.top=laneTop+'px';
+  el.style.bottom='auto';
+
+  trackEl.appendChild(el);
   t.el=el;
 }
 
@@ -585,8 +604,8 @@ function explodeBomb(tile){
   tile.el.classList.add('boom');
   beep(150,.3,'sawtooth',.15);
   // Afecta jugadores en radio de 2 casillas
-  players.forEach(p=>{
-    if(!p.finished && Math.abs(p.pos-tile.pos)<=2){
+  players.forEach((p,i)=>{
+    if(!p.finished && Math.abs(p.pos-tile.pos)<=2 && (tile.laneIdx===undefined||tile.laneIdx===i)){
       const back=1+Math.floor(Math.random()*3);
       p.pos=Math.max(p.pos-back,0);
       showTilePopup(`💣 ¡BOOM! ${p.name} retrocede ${back}`);
@@ -636,9 +655,16 @@ function buildScoreboard(){
   });
 }
 function updateTokens(){
-  const tw=(document.getElementById('lanes-el').offsetWidth||300)-28;
+  const lanesEl=document.getElementById('lanes-el');
+  const tw=lanesEl.offsetWidth||300;
+  const tokenSize=52; // px aprox del token
   players.forEach((p,i)=>{
-    const tok=document.getElementById('tok-'+i); if(tok) tok.style.left=Math.min(p.pos/cfg.goal,1)*tw+'px';
+    const tok=document.getElementById('tok-'+i);
+    if(tok){
+      // 0 = inicio (left:0), goal = final (left: tw - tokenSize)
+      const x=Math.min(p.pos/cfg.goal,1)*(tw-tokenSize);
+      tok.style.left=x+'px';
+    }
     const sp=document.getElementById('scp-'+i); if(sp) sp.textContent=p.pos+'/'+cfg.goal;
   });
 }
@@ -755,7 +781,7 @@ function checkAnswer(){
   if(val===correct){
     soundCoin(); p.pos=Math.min(p.pos+1,cfg.goal);
     tok.classList.add('bounce'); setTimeout(()=>tok.classList.remove('bounce'),500);
-    const tile=specialTiles.find(t=>Math.abs(t.pos-p.pos)<=1);
+    const tile=specialTiles.find(t=>Math.abs(t.pos-p.pos)<=1 && (t.laneIdx===undefined || t.laneIdx===currentIdx));
     if(tile){
       soundSpecial(); let msg='';
       if(tile.type==='⭐'){
