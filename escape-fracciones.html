@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-09YP073NX2"></script>
+<script>
+window.dataLayer=window.dataLayer||[];
+function gtag(){dataLayer.push(arguments);}
+gtag("js",new Date());
+gtag("config","G-09YP073NX2");
+</script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
 <title>Escape de Fracciones — EduGamePlay</title>
@@ -21,8 +29,18 @@ body{
   font-family:'Crimson Pro',serif;
   background:var(--stone);
   color:var(--text);
-  display:flex;justify-content:center;align-items:center;
+  display:flex;justify-content:center;align-items:flex-start;
   min-height:100vh;
+  padding:12px;
+  overflow-y:auto;
+}
+#app{position:relative;z-index:1;width:100%;max-width:600px;padding:12px;}
+@media(min-width:720px){
+  #app{max-width:680px;}
+  .dungeon-scene{height:clamp(200px,30vw,280px);}
+  .frac-question{font-size:28px;}
+  .options-grid{grid-template-columns:repeat(2,1fr);gap:12px;}
+  .opt-btn{font-size:18px;padding:14px;}
 }
 
 /* ── STONE TEXTURE ── */
@@ -34,7 +52,7 @@ body::before{
   pointer-events:none;z-index:0;
 }
 
-#app{position:relative;z-index:1;width:100%;max-width:520px;padding:12px;}
+/* app definido arriba con responsive */
 
 /* ── SETUP ── */
 #setup{text-align:center;padding:20px 0;}
@@ -332,6 +350,14 @@ body::before{
   transition:opacity .3s;
 }
 .room-flash.show{opacity:1;}
+
+.footer-game{text-align:center;padding:20px 16px;border-top:1px solid rgba(255,255,255,.08);color:#666;font-size:12px;line-height:1.8;background:#0a0a18;}
+.footer-game-brand{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:30px;padding:6px 16px;margin:6px 0;}
+.footer-game-name{font-family:'Courier New',monospace;font-size:13px;font-weight:bold;color:#facc15;}
+.footer-game-ver{font-size:10px;background:rgba(167,139,250,.15);color:#a78bfa;border:1px solid rgba(167,139,250,.3);border-radius:10px;padding:2px 7px;font-weight:700;letter-spacing:1px;}
+.footer-game-dev{font-size:11px;color:#666;}
+.footer-game-dev strong{color:#aaa;font-weight:600;}
+.footer-game-copy{font-size:10px;color:#555;margin-top:2px;letter-spacing:.5px;}
 </style>
 </head>
 <body>
@@ -823,5 +849,15 @@ function backToSetup(){
   document.getElementById('setup').style.display='block';
 }
 </script>
+
+<div class="footer-game">
+  <div>Hecho con ❤️ para el salón de clases · HTML puro · Sin instalación · Gratis</div>
+  <div class="footer-game-brand">
+    <span class="footer-game-name">EduGamePlay</span>
+    <span class="footer-game-ver">v 0.1</span>
+  </div>
+  <div class="footer-game-dev">Desarrollado por <strong>Juan Pariona</strong></div>
+  <div class="footer-game-copy">© 2026 Juan Pariona · Todos los derechos reservados</div>
+</div>
 </body>
 </html>
