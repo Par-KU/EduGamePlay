@@ -201,7 +201,34 @@ body{background:#111;display:flex;flex-direction:column;align-items:center;min-h
 .tag-warn{color:#fbbf24;}
 .tag-dyn{font-size:9px;background:rgba(96,165,250,.15);color:#60a5fa;padding:1px 5px;border-radius:8px;margin-left:4px;vertical-align:middle;}
 
-/* Back link */
+/* ── FULLSCREEN MÓVIL ── */
+#btn-fullscreen{
+  display:flex;align-items:center;justify-content:center;
+  width:32px;height:32px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:6px;color:#aaa;font-size:16px;
+  cursor:pointer;flex-shrink:0;
+  -webkit-tap-highlight-color:transparent;
+}
+#btn-fullscreen:active{background:rgba(255,255,255,.15);}
+@media(min-width:720px){#btn-fullscreen{display:none;}}
+
+/* Modo fullscreen — se ve como app nativa */
+:fullscreen #app,
+:-webkit-full-screen #app{
+  max-width:100vw;width:100vw;height:100vh;
+  border-radius:0;overflow-y:auto;
+  display:flex;flex-direction:column;
+}
+:fullscreen body,
+:-webkit-full-screen body{
+  padding:0;background:#0d0d1a;
+}
+:fullscreen .footer-game,
+:-webkit-full-screen .footer-game{display:none;}
+:fullscreen #setup,
+:-webkit-full-screen #setup{padding-bottom:40px;}
 .back-link{display:block;text-align:center;padding:10px;color:#666;font-size:12px;text-decoration:none;border-top:1px solid rgba(255,255,255,.05);}
 .back-link:active{color:#a78bfa;}
 
@@ -362,6 +389,7 @@ body{background:#111;display:flex;flex-direction:column;align-items:center;min-h
     <span class="op-badge" id="op-badge">✖️</span>
     <span id="grade-badge">1° grado</span>
     <button onclick="confirmExit()" style="background:transparent;border:1px solid rgba(255,255,255,.15);color:#666;font-size:11px;padding:3px 8px;border-radius:6px;cursor:pointer;font-family:'Courier New',monospace;-webkit-tap-highlight-color:transparent;">✕ Salir</button>
+    <button id="btn-fullscreen" onclick="toggleFullscreen()" title="Pantalla completa">⛶</button>
   </div>
   <div id="qpanel">
     <div id="q-turn">TURNO</div>
@@ -934,6 +962,30 @@ function confirmExit(){
     document.getElementById('setup').style.display='block';
   }
 }
+
+// ── FULLSCREEN MÓVIL ──
+function toggleFullscreen(){
+  const btn=document.getElementById('btn-fullscreen');
+  if(!document.fullscreenElement && !document.webkitFullscreenElement){
+    const el=document.documentElement;
+    if(el.requestFullscreen) el.requestFullscreen();
+    else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    // Intentar orientación horizontal
+    try{ screen.orientation.lock('landscape').catch(()=>{}); }catch(e){}
+    btn.textContent='✕';
+    btn.title='Salir de pantalla completa';
+  } else {
+    if(document.exitFullscreen) document.exitFullscreen();
+    else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+    try{ screen.orientation.unlock(); }catch(e){}
+    btn.textContent='⛶';
+    btn.title='Pantalla completa';
+  }
+}
+document.addEventListener('fullscreenchange',()=>{
+  const btn=document.getElementById('btn-fullscreen');
+  if(btn) btn.textContent=document.fullscreenElement?'✕':'⛶';
+});
 
 // Inicializar jugadores por defecto
 const list=document.getElementById('players-list');
