@@ -201,77 +201,7 @@ body{background:#111;display:flex;flex-direction:column;align-items:center;min-h
 .tag-warn{color:#fbbf24;}
 .tag-dyn{font-size:9px;background:rgba(96,165,250,.15);color:#60a5fa;padding:1px 5px;border-radius:8px;margin-left:4px;vertical-align:middle;}
 
-/* ── FULLSCREEN MÓVIL ── */
-#btn-fullscreen{
-  display:flex;align-items:center;justify-content:center;
-  width:32px;height:32px;
-  background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.2);
-  border-radius:6px;color:#aaa;font-size:16px;
-  cursor:pointer;flex-shrink:0;
-  -webkit-tap-highlight-color:transparent;
-}
-#btn-fullscreen:active{background:rgba(255,255,255,.15);}
-@media(min-width:720px){#btn-fullscreen{display:none;}}
-
-/* Modo fullscreen — se ve como app nativa */
-:fullscreen body,:-webkit-full-screen body{
-  padding:0;background:#0d0d1a;
-}
-:fullscreen #app,:-webkit-full-screen #app{
-  max-width:100vw;width:100vw;height:100vh;
-  border-radius:0;overflow:hidden;
-  display:flex;flex-direction:column;
-}
-/* Pista reducida para que todo quepa */
-:fullscreen #track,:-webkit-full-screen #track{
-  height:32vh !important;
-}
-/* Tokens más pequeños en fullscreen */
-:fullscreen .token img,:-webkit-full-screen .token img{
-  width:32px !important;height:32px !important;
-}
-/* HUD compacto */
-:fullscreen #hud,:-webkit-full-screen #hud{
-  padding:4px 10px;
-}
-/* Panel pregunta compacto */
-:fullscreen #qpanel,:-webkit-full-screen #qpanel{
-  padding:8px 12px;flex:1;
-}
-:fullscreen #q-turn,:-webkit-full-screen #q-turn{
-  margin-bottom:4px;
-}
-:fullscreen #q-text,:-webkit-full-screen #q-text{
-  font-size:20px;margin-bottom:6px;min-height:24px;
-}
-:fullscreen #action-row,:-webkit-full-screen #action-row{
-  margin-bottom:6px;
-}
-:fullscreen #dice-face,:-webkit-full-screen #dice-face{
-  width:40px;height:40px;font-size:18px;
-}
-:fullscreen #roll-btn,:-webkit-full-screen #roll-btn{
-  min-height:40px;padding:6px 12px;
-}
-/* Opciones más compactas */
-:fullscreen .opt-btn,:-webkit-full-screen .opt-btn{
-  min-height:44px;padding:8px 4px;font-size:18px;
-}
-:fullscreen #opts-grid,:-webkit-full-screen #opts-grid{
-  margin-top:6px;gap:6px;
-  grid-template-columns:1fr 1fr;
-}
-/* Scoreboard compacto horizontal */
-:fullscreen #scoreboard,:-webkit-full-screen #scoreboard{
-  padding:4px 8px;gap:4px;
-}
-:fullscreen .sc,:-webkit-full-screen .sc{
-  padding:3px 6px;min-width:52px;
-}
-/* Ocultar footer en fullscreen */
-:fullscreen .footer-game,:-webkit-full-screen .footer-game{display:none;}
-:fullscreen #setup,:-webkit-full-screen #setup{overflow-y:auto;height:100vh;}
+/* Back link */
 .back-link{display:block;text-align:center;padding:10px;color:#666;font-size:12px;text-decoration:none;border-top:1px solid rgba(255,255,255,.05);}
 .back-link:active{color:#a78bfa;}
 
@@ -432,7 +362,6 @@ body{background:#111;display:flex;flex-direction:column;align-items:center;min-h
     <span class="op-badge" id="op-badge">✖️</span>
     <span id="grade-badge">1° grado</span>
     <button onclick="confirmExit()" style="background:transparent;border:1px solid rgba(255,255,255,.15);color:#666;font-size:11px;padding:3px 8px;border-radius:6px;cursor:pointer;font-family:'Courier New',monospace;-webkit-tap-highlight-color:transparent;">✕ Salir</button>
-    <button id="btn-fullscreen" onclick="toggleFullscreen()" title="Pantalla completa">⛶</button>
   </div>
   <div id="qpanel">
     <div id="q-turn">TURNO</div>
@@ -1005,30 +934,6 @@ function confirmExit(){
     document.getElementById('setup').style.display='block';
   }
 }
-
-// ── FULLSCREEN MÓVIL ──
-function toggleFullscreen(){
-  const btn=document.getElementById('btn-fullscreen');
-  if(!document.fullscreenElement && !document.webkitFullscreenElement){
-    const el=document.documentElement;
-    if(el.requestFullscreen) el.requestFullscreen();
-    else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-    // Intentar orientación horizontal
-    try{ screen.orientation.lock('landscape').catch(()=>{}); }catch(e){}
-    btn.textContent='✕';
-    btn.title='Salir de pantalla completa';
-  } else {
-    if(document.exitFullscreen) document.exitFullscreen();
-    else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
-    try{ screen.orientation.unlock(); }catch(e){}
-    btn.textContent='⛶';
-    btn.title='Pantalla completa';
-  }
-}
-document.addEventListener('fullscreenchange',()=>{
-  const btn=document.getElementById('btn-fullscreen');
-  if(btn) btn.textContent=document.fullscreenElement?'✕':'⛶';
-});
 
 // Inicializar jugadores por defecto
 const list=document.getElementById('players-list');
