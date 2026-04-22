@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-09YP073NX2"></script>
+<script>
+window.dataLayer=window.dataLayer||[];
+function gtag(){dataLayer.push(arguments);}
+gtag("js",new Date());
+gtag("config","G-09YP073NX2");
+</script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Completa tu perfil — EduGamePlay</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0e0e1a;--bg2:#16162a;--bg3:#1e1e38;
+  --accent:#facc15;--accent2:#f97316;
+  --purple:#a78bfa;--green:#4ade80;--blue:#60a5fa;
+  --pink:#f472b6;--red:#f87171;
+  --text:#f1f0e8;--muted:#6b6b8a;
+  --border:rgba(255,255,255,0.07);
+  --radius:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100vh;}
+body{
+  font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);
+  display:flex;flex-direction:column;align-items:center;
+  min-height:100vh;padding:20px;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%,rgba(167,139,250,0.12) 0%,transparent 70%),
+    var(--bg);
+  overflow-x:hidden;
+}
+
+/* Estrellas */
+.star{position:fixed;border-radius:50%;background:#fff;pointer-events:none;animation:twinkle var(--dur,3s) ease-in-out infinite var(--delay,0s);z-index:0;}
+@keyframes twinkle{0%,100%{opacity:0}50%{opacity:.6}}
+
+/* Logo top */
+.top-logo{
+  text-decoration:none;margin-top:20px;margin-bottom:24px;position:relative;z-index:1;
+  display:flex;align-items:center;gap:10px;
+}
+.top-logo-text{
+  font-family:'Fredoka One',cursive;font-size:clamp(24px,6vw,32px);line-height:1;
+  background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 50%,var(--pink) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+/* Banner bienvenida */
+.welcome-banner{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(167,139,250,.12);color:var(--purple);
+  font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px;
+  border:1px solid rgba(167,139,250,.3);
+  letter-spacing:1.5px;text-transform:uppercase;
+  margin-bottom:10px;z-index:1;position:relative;
+}
+
+/* Card */
+.profile-card{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:clamp(24px,5vw,36px);
+  width:100%;max-width:520px;
+  position:relative;z-index:1;
+  box-shadow:0 20px 60px rgba(0,0,0,.4);
+}
+.card-icon{
+  font-size:clamp(40px,10vw,56px);
+  text-align:center;margin-bottom:8px;
+}
+.card-title{
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(22px,6vw,28px);
+  text-align:center;color:var(--text);
+  margin-bottom:6px;line-height:1.2;
+}
+.card-sub{
+  text-align:center;color:var(--muted);
+  font-size:clamp(12px,3vw,14px);
+  margin-bottom:20px;line-height:1.5;
+}
+
+/* User info badge */
+.user-badge{
+  background:rgba(167,139,250,.08);
+  border:1px solid rgba(167,139,250,.2);
+  border-radius:10px;padding:10px 14px;
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:20px;
+}
+.user-badge .avatar{
+  width:40px;height:40px;border-radius:50%;
+  background:linear-gradient(135deg,var(--purple),var(--pink));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-family:'Fredoka One',cursive;font-size:18px;
+  flex-shrink:0;
+}
+.user-badge .info{flex:1;min-width:0;overflow:hidden;}
+.user-badge .info-email{color:var(--text);font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.user-badge .info-rol{color:var(--muted);font-size:11px;}
+
+/* Form */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:480px){.form-row{grid-template-columns:1fr;}}
+
+.form-group{margin-bottom:14px;}
+.form-label{
+  display:block;font-size:11px;font-weight:800;color:var(--purple);
+  letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;
+}
+.form-label .required{color:var(--accent);}
+.form-label .optional{color:var(--muted);font-weight:600;letter-spacing:.5px;text-transform:none;}
+.form-hint{font-size:11px;color:var(--muted);margin-top:4px;font-style:italic;}
+
+.form-input,.form-select{
+  width:100%;padding:12px 14px;
+  font-family:'Nunito',sans-serif;font-size:15px;
+  background:rgba(0,0,0,.3);color:var(--text);
+  border:1.5px solid var(--border);border-radius:10px;
+  outline:none;min-height:48px;
+  transition:border-color .15s;
+}
+.form-input:focus,.form-select:focus{border-color:var(--purple);background:rgba(0,0,0,.5);}
+.form-input::placeholder{color:var(--muted);}
+.form-select{
+  appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%236b6b8a' d='M6 8L0 0h12z'/></svg>");
+  background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;
+}
+
+/* Alert */
+.alert{
+  padding:12px 14px;border-radius:10px;
+  font-size:13px;line-height:1.5;margin-bottom:14px;display:none;
+}
+.alert.show{display:block;}
+.alert.error{background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);color:var(--red);}
+.alert.success{background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.3);color:var(--green);}
+.alert.info{background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.3);color:var(--purple);}
+
+/* Submit */
+.submit-btn{
+  width:100%;background:var(--accent);color:#1a1a00;
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(15px,4vw,17px);
+  padding:14px;border:none;border-radius:12px;
+  cursor:pointer;border-bottom:4px solid #b8960f;
+  min-height:52px;margin-top:8px;letter-spacing:.5px;
+  transition:transform .15s,border-bottom-width .15s,opacity .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.submit-btn:active:not(:disabled){transform:translateY(2px);border-bottom-width:1px;}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed;}
+.submit-btn .spinner{
+  display:inline-block;width:14px;height:14px;
+  border:2px solid rgba(26,26,0,.3);border-top-color:#1a1a00;
+  border-radius:50%;animation:spin .6s linear infinite;
+  vertical-align:middle;margin-right:6px;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Loading inicial */
+#initial-loading{
+  text-align:center;padding:40px 20px;color:var(--muted);
+}
+#initial-loading .spinner{
+  width:40px;height:40px;border:3px solid rgba(167,139,250,.2);
+  border-top-color:var(--purple);border-radius:50%;
+  animation:spin .8s linear infinite;margin:0 auto 12px;
+}
+
+/* Logout link */
+.logout-link{
+  display:block;text-align:center;
+  margin-top:16px;font-size:12px;
+  color:var(--muted);text-decoration:none;
+  padding:8px;cursor:pointer;background:transparent;border:none;width:100%;
+  font-family:'Nunito',sans-serif;
+}
+.logout-link:hover{color:var(--red);}
+
+/* Footer mini */
+.footer-mini{
+  margin-top:auto;padding:20px 16px 10px;
+  text-align:center;color:var(--muted);
+  font-size:11px;line-height:1.6;
+  position:relative;z-index:1;
+}
+.footer-mini-brand{
+  font-family:'Fredoka One',cursive;font-size:13px;
+  background:linear-gradient(135deg,var(--accent),var(--pink));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+/* Info box */
+.info-box{
+  background:rgba(96,165,250,.06);
+  border:1px solid rgba(96,165,250,.2);
+  border-radius:10px;padding:10px 14px;
+  font-size:12px;color:var(--blue);line-height:1.5;
+  margin-bottom:14px;
+}
+.info-box strong{color:var(--text);}
+</style>
+</head>
+<body>
+
+<!-- Logo -->
+<a class="top-logo" href="index.html">
+  <span class="top-logo-text">EduGamePlay</span>
+</a>
+<div class="welcome-banner">👋 Primer ingreso</div>
+
+<!-- Loading inicial (antes de saber si el perfil está completo) -->
+<div id="initial-loading" class="profile-card">
+  <div class="spinner"></div>
+  <div>Verificando tu perfil...</div>
+</div>
+
+<!-- Formulario principal (oculto hasta saber que hay que completar) -->
+<div class="profile-card" id="profile-form-card" style="display:none;">
+  <div class="card-icon">📝</div>
+  <div class="card-title">¡Bienvenido!</div>
+  <div class="card-sub">Completa estos datos para continuar. Solo te los pediremos esta vez.</div>
+
+  <!-- Badge con el usuario -->
+  <div class="user-badge">
+    <div class="avatar" id="userAvatar">U</div>
+    <div class="info">
+      <div class="info-email" id="userEmail">—</div>
+      <div class="info-rol" id="userRol">—</div>
+    </div>
+  </div>
+
+  <div class="info-box">
+    💡 <strong>¿Por qué pedimos estos datos?</strong> Nos ayudan a saber desde dónde se usa la plataforma y mejorarla con el tiempo. Tus datos son privados.
+  </div>
+
+  <!-- Alert -->
+  <div class="alert" id="formAlert"></div>
+
+  <!-- Formulario -->
+  <form id="profileForm" autocomplete="off">
+
+    <div class="form-group">
+      <label class="form-label">Nombre completo <span class="required">*</span></label>
+      <input class="form-input" type="text" id="fNombre" placeholder="Ej: Juan Pérez García" required autocomplete="name"/>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">País <span class="required">*</span></label>
+        <select class="form-select" id="fPais" required>
+          <option value="">Selecciona...</option>
+          <option value="México">🇲🇽 México</option>
+          <option value="Perú">🇵🇪 Perú</option>
+          <option value="Colombia">🇨🇴 Colombia</option>
+          <option value="Argentina">🇦🇷 Argentina</option>
+          <option value="Chile">🇨🇱 Chile</option>
+          <option value="España">🇪🇸 España</option>
+          <option value="Ecuador">🇪🇨 Ecuador</option>
+          <option value="Venezuela">🇻🇪 Venezuela</option>
+          <option value="Bolivia">🇧🇴 Bolivia</option>
+          <option value="Uruguay">🇺🇾 Uruguay</option>
+          <option value="Paraguay">🇵🇾 Paraguay</option>
+          <option value="Costa Rica">🇨🇷 Costa Rica</option>
+          <option value="Guatemala">🇬🇹 Guatemala</option>
+          <option value="Honduras">🇭🇳 Honduras</option>
+          <option value="El Salvador">🇸🇻 El Salvador</option>
+          <option value="Nicaragua">🇳🇮 Nicaragua</option>
+          <option value="Panamá">🇵🇦 Panamá</option>
+          <option value="Rep. Dominicana">🇩🇴 Rep. Dominicana</option>
+          <option value="Puerto Rico">🇵🇷 Puerto Rico</option>
+          <option value="Cuba">🇨🇺 Cuba</option>
+          <option value="Estados Unidos">🇺🇸 Estados Unidos</option>
+          <option value="Otro">🌍 Otro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Rango de edad <span class="required">*</span></label>
+        <select class="form-select" id="fEdad" required>
+          <option value="">Selecciona...</option>
+          <option value="6-8">6 a 8 años</option>
+          <option value="9-11">9 a 11 años</option>
+          <option value="12-14">12 a 14 años</option>
+          <option value="15-17">15 a 17 años</option>
+          <option value="18-24">18 a 24 años</option>
+          <option value="25-34">25 a 34 años</option>
+          <option value="35-44">35 a 44 años</option>
+          <option value="45-54">45 a 54 años</option>
+          <option value="55+">55+ años</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Estado/Provincia <span class="required">*</span></label>
+        <input class="form-input" type="text" id="fEstado" placeholder="Ej: Jalisco" required/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ciudad <span class="optional">(opcional)</span></label>
+        <input class="form-input" type="text" id="fCiudad" placeholder="Ej: Guadalajara"/>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Escuela / Institución <span class="optional">(opcional)</span></label>
+      <input class="form-input" type="text" id="fEscuela" placeholder="Ej: Primaria Benito Juárez"/>
+    </div>
+
+    <button type="submit" class="submit-btn" id="submitBtn">
+      ✓ Guardar y continuar
+    </button>
+  </form>
+
+  <button type="button" class="logout-link" id="logoutBtn">
+    ↪ Cerrar sesión
+  </button>
+</div>
+
+<!-- Éxito -->
+<div class="profile-card" id="success-card" style="display:none;">
+  <div style="text-align:center;">
+    <div class="card-icon">✅</div>
+    <div class="card-title" style="color:var(--green);">¡Perfil guardado!</div>
+    <div class="card-sub">Redirigiendo a tu panel en <span id="countdown">3</span> segundos...</div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="footer-mini">
+  <div><span class="footer-mini-brand">EduGamePlay</span> v 0.2</div>
+  <div>© 2026 Juan Pariona</div>
+</div>
+
+<script type="module">
+import { auth, db } from './js/firebase-config.js';
+import {
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  doc, getDoc, setDoc, updateDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const initialLoading = document.getElementById('initial-loading');
+const formCard = document.getElementById('profile-form-card');
+const successCard = document.getElementById('success-card');
+const form = document.getElementById('profileForm');
+const formAlert = document.getElementById('formAlert');
+const submitBtn = document.getElementById('submitBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+
+let currentUser = null;
+let currentData = null;
+
+function showAlert(msg, type='error'){
+  formAlert.textContent = msg;
+  formAlert.className = `alert show ${type}`;
+}
+function hideAlert(){ formAlert.className = 'alert'; }
+
+function getRoleLabel(rol){
+  const labels = {admin:'👑 Administrador', docente:'🎓 Docente', alumno:'📚 Alumno'};
+  return labels[rol] || '👤 Usuario';
+}
+
+function redirectByRole(rol){
+  if(rol === 'admin'){
+    window.location.href = 'admin.html';
+  } else {
+    window.location.href = 'dashboard.html';
+  }
+}
+
+// ── VERIFICACIÓN INICIAL ──
+onAuthStateChanged(auth, async (user)=>{
+  if(!user){
+    // No hay sesión → al login
+    console.log('⚠️ Sin sesión, redirigiendo a login');
+    window.location.href = 'login.html';
+    return;
+  }
+
+  currentUser = user;
+  console.log('👤 Usuario autenticado:', user.email, 'UID:', user.uid);
+
+  try {
+    const userRef = doc(db, 'users', user.uid);
+    const userDoc = await getDoc(userRef);
+
+    if(userDoc.exists()){
+      currentData = userDoc.data();
+      console.log('📄 Datos del usuario:', currentData);
+
+      // ¿Ya completó el perfil? → redirigir según rol (Opción A)
+      if(currentData.primerLogin === false){
+        console.log('✅ Perfil ya completado, redirigiendo por rol...');
+        redirectByRole(currentData.rol);
+        return;
+      }
+    } else {
+      // No hay documento → tratar como primer login
+      console.log('⚠️ Sin documento en Firestore. Se creará uno nuevo.');
+      currentData = {};
+    }
+
+    // Mostrar formulario
+    initialLoading.style.display = 'none';
+    formCard.style.display = 'block';
+
+    // Llenar badge
+    document.getElementById('userEmail').textContent = user.email;
+    document.getElementById('userAvatar').textContent = (user.email || 'U').charAt(0).toUpperCase();
+    document.getElementById('userRol').textContent = getRoleLabel(currentData.rol || 'alumno');
+
+    // Pre-llenar nombre si existe
+    if(currentData.nombre){
+      document.getElementById('fNombre').value = currentData.nombre;
+    }
+
+  } catch(err){
+    console.error('Error verificando perfil:', err);
+    initialLoading.innerHTML = `
+      <div style="color:var(--red);">
+        <div style="font-size:40px;margin-bottom:10px;">⚠️</div>
+        <div>Error cargando perfil: ${err.message}</div>
+        <button onclick="location.reload()" style="margin-top:14px;padding:10px 20px;background:var(--purple);color:white;border:none;border-radius:8px;cursor:pointer;">Reintentar</button>
+      </div>
+    `;
+  }
+});
+
+// ── SUBMIT FORMULARIO ──
+form.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  hideAlert();
+
+  const nombre = document.getElementById('fNombre').value.trim();
+  const pais = document.getElementById('fPais').value;
+  const edad = document.getElementById('fEdad').value;
+  const estado = document.getElementById('fEstado').value.trim();
+  const ciudad = document.getElementById('fCiudad').value.trim();
+  const escuela = document.getElementById('fEscuela').value.trim();
+
+  if(!nombre || !pais || !edad || !estado){
+    showAlert('Por favor completa todos los campos obligatorios (*).');
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="spinner"></span>Guardando...';
+
+  try {
+    const userRef = doc(db, 'users', currentUser.uid);
+
+    // Datos a guardar
+    const dataToSave = {
+      email: currentUser.email,
+      nombre: nombre,
+      rol: currentData.rol || 'alumno',  // Mantener rol existente o default alumno
+      activo: currentData.activo !== false,
+      primerLogin: false,
+      perfil: {
+        pais: pais,
+        estado: estado,
+        ciudad: ciudad || null,
+        edad: edad,
+        escuela: escuela || null,
+        completadoEn: serverTimestamp()
+      },
+      stats: currentData.stats || {
+        totalPartidas: 0,
+        tiempoTotalSegundos: 0,
+        juegosJugados: {}
+      }
+    };
+
+    // Si no existía documento, crear; si existía, actualizar
+    if(currentData && Object.keys(currentData).length > 0){
+      await updateDoc(userRef, dataToSave);
+    } else {
+      dataToSave.creadoEn = serverTimestamp();
+      dataToSave.creadoPor = 'self-registration';
+      await setDoc(userRef, dataToSave);
+    }
+
+    console.log('✅ Perfil guardado correctamente');
+
+    // Mostrar éxito
+    formCard.style.display = 'none';
+    successCard.style.display = 'block';
+
+    // Countdown y redirect
+    let count = 3;
+    const countEl = document.getElementById('countdown');
+    const interval = setInterval(()=>{
+      count--;
+      if(countEl) countEl.textContent = count;
+      if(count <= 0){
+        clearInterval(interval);
+        redirectByRole(dataToSave.rol);
+      }
+    }, 1000);
+
+  } catch(err){
+    console.error('Error guardando perfil:', err);
+    showAlert('Error al guardar: ' + (err.message || err.code));
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '✓ Guardar y continuar';
+  }
+});
+
+// ── LOGOUT ──
+logoutBtn.addEventListener('click', async ()=>{
+  if(confirm('¿Cerrar sesión sin completar el perfil?')){
+    try {
+      await signOut(auth);
+      window.location.href = 'login.html';
+    } catch(err){
+      alert('Error al cerrar sesión: ' + err.message);
+    }
+  }
+});
+</script>
+
+<script>
+// Estrellas
+const starCount = window.innerWidth < 480 ? 15 : 35;
+for(let i=0;i<starCount;i++){
+  const s=document.createElement('div');s.className='star';
+  const sz=1+Math.random()*1.5;
+  s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${sz}px;height:${sz}px;--dur:${2+Math.random()*4}s;--delay:${Math.random()*5}s;`;
+  document.body.appendChild(s);
+}
+</script>
+
+</body>
+</html>
