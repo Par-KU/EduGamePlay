@@ -113,9 +113,83 @@ footer span{color:var(--purple);}
   .play-btn{width:100%;}
   .section-line{display:none;}
 }
+
+/* ═══ MINI-HEADER DE AUTH (agregado v0.2) ═══ */
+#auth-loading{
+  position:fixed;inset:0;background:var(--bg);z-index:999;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  font-family:'Nunito',sans-serif;color:var(--muted);font-size:13px;
+}
+#auth-loading .spinner{
+  width:36px;height:36px;border:3px solid rgba(167,139,250,.2);
+  border-top-color:var(--purple);border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+#user-header{
+  display:none;align-items:center;gap:10px;
+  background:#0a0a18;border-bottom:1px solid var(--border);
+  padding:8px 16px;min-height:40px;
+  position:sticky;top:0;z-index:50;
+  flex-wrap:wrap;
+}
+#user-greet{
+  display:flex;align-items:center;gap:6px;flex:1;min-width:0;
+  font-size:13px;color:var(--text);
+}
+#user-greet .u-wave{font-size:15px;}
+#user-greet .u-name{font-weight:700;color:var(--accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#user-greet .u-role{
+  font-size:11px;color:var(--muted);
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border);
+  border-radius:20px;padding:2px 8px;
+  white-space:nowrap;
+}
+.hdr-btn{
+  font-size:12px;font-weight:700;font-family:'Nunito',sans-serif;
+  padding:6px 12px;border-radius:8px;
+  background:rgba(167,139,250,.12);color:var(--purple);
+  border:1px solid rgba(167,139,250,.25);
+  text-decoration:none;cursor:pointer;
+  display:inline-flex;align-items:center;gap:4px;
+  -webkit-tap-highlight-color:transparent;
+  transition:background .15s;
+}
+.hdr-btn:hover,.hdr-btn:active{background:rgba(167,139,250,.2);}
+.hdr-btn.logout{
+  background:rgba(248,113,113,.1);color:var(--pink);
+  border-color:rgba(248,113,113,.25);
+}
+.hdr-btn.logout:hover,.hdr-btn.logout:active{background:rgba(248,113,113,.18);}
+
+@media(max-width:480px){
+  #user-greet .u-role{display:none;}
+  #user-greet{font-size:12px;}
+  .hdr-btn{padding:5px 10px;font-size:11px;}
+}
 </style>
 </head>
 <body>
+
+<!-- Loading de verificación de sesión -->
+<div id="auth-loading">
+  <div class="spinner"></div>
+  <div>Verificando sesión...</div>
+</div>
+
+<!-- Mini-header con usuario autenticado -->
+<div id="user-header">
+  <div id="user-greet">
+    <span class="u-wave">👋</span>
+    <span>Hola,&nbsp;</span>
+    <span class="u-name" id="userName">—</span>
+    <span class="u-role" id="userRole"></span>
+  </div>
+  <a class="hdr-btn" href="admin.html" id="adminBtn" style="display:none;">📊 Admin</a>
+  <button class="hdr-btn logout" id="logoutBtn">↪ Salir</button>
+</div>
 
 <header>
   <div class="logo">EduGamePlay</div>
@@ -201,7 +275,7 @@ footer span{color:var(--purple);}
   </div>
   <div class="footer-brand">
     <span class="footer-brand-name">EduGamePlay</span>
-    <span class="footer-version">v 0.1</span>
+    <span class="footer-version">v 0.2</span>
   </div>
   <div class="footer-dev">
     Desarrollado por <strong>Juan Pariona</strong>
@@ -219,5 +293,34 @@ for(let i=0;i<count;i++){
 }
 setTimeout(()=>{ document.getElementById('pfill').style.width='13.3%'; },400);
 </script>
+
+<!-- ═══ SCRIPT DE AUTH (agregado v0.2) ═══ -->
+<script type="module">
+import { requireAuth, logout, getDisplayName, getRoleLabel } from './js/auth.js';
+
+try {
+  const user = await requireAuth();
+
+  document.getElementById('userName').textContent = getDisplayName(user);
+  document.getElementById('userRole').textContent = getRoleLabel(user.rol);
+
+  if(user.rol === 'admin') {
+    document.getElementById('adminBtn').style.display = 'inline-flex';
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', async ()=>{
+    if(confirm('¿Cerrar sesión?')) await logout('index.html');
+  });
+
+  // Mostrar header, ocultar loading
+  document.getElementById('auth-loading').style.display = 'none';
+  document.getElementById('user-header').style.display = 'flex';
+
+} catch(err) {
+  console.error('Auth error:', err);
+  // requireAuth() ya redirige a login si no hay sesión
+}
+</script>
+
 </body>
 </html>
