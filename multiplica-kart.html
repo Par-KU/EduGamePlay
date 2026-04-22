@@ -18,6 +18,34 @@ gtag("config","G-09YP073NX2");
 body{background:#111;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:12px;}
 #app{font-family:'Courier New',monospace;background:#1a1a2e;border-radius:12px;overflow:hidden;width:100%;max-width:900px;}
 
+/* ── MINI HEADER DE USUARIO ── */
+#user-header{
+  background:#0a0a18;border-bottom:1px solid rgba(255,255,255,.08);
+  padding:8px 14px;display:flex;align-items:center;gap:10px;
+  font-family:'Nunito',sans-serif;font-size:12px;
+}
+#user-greet{flex:1;color:#f1f0e8;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#user-greet .u-wave{margin-right:4px;}
+#user-greet .u-name{color:#facc15;}
+#user-greet .u-role{color:#6b6b8a;font-size:10px;margin-left:6px;font-weight:400;}
+.hdr-btn{
+  background:transparent;border:1px solid rgba(255,255,255,.15);
+  color:#aaa;font-family:'Nunito',sans-serif;font-size:11px;font-weight:600;
+  padding:6px 10px;border-radius:6px;cursor:pointer;white-space:nowrap;
+  text-decoration:none;display:inline-flex;align-items:center;gap:4px;
+  -webkit-tap-highlight-color:transparent;
+  transition:background .12s,color .12s;
+}
+.hdr-btn:active{background:rgba(255,255,255,.06);}
+.hdr-btn.logout{border-color:rgba(248,113,113,.3);color:#f87171;}
+.hdr-btn.logout:active{background:rgba(248,113,113,.1);}
+@media(max-width:480px){
+  #user-header{padding:6px 10px;gap:6px;}
+  #user-greet{font-size:11px;}
+  #user-greet .u-role{display:none;}
+  .hdr-btn{padding:5px 8px;font-size:10px;}
+}
+
 /* Desktop layout — mejoras visuales cuando hay más espacio */
 @media(min-width:720px){
   .setup-title{font-size:26px;}
@@ -227,6 +255,19 @@ body{background:#111;display:flex;flex-direction:column;align-items:center;min-h
 .back-link{display:block;text-align:center;padding:10px;color:#666;font-size:12px;text-decoration:none;border-top:1px solid rgba(255,255,255,.05);}
 .back-link:active{color:#a78bfa;}
 
+/* ── LOADING OVERLAY (antes del login check) ── */
+#auth-loading{
+  position:fixed;inset:0;background:#0e0e1a;z-index:9999;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;
+  font-family:'Nunito',sans-serif;color:#6b6b8a;font-size:13px;
+}
+#auth-loading .spinner{
+  width:40px;height:40px;border:3px solid rgba(167,139,250,.2);
+  border-top-color:#a78bfa;border-radius:50%;
+  animation:authspin .8s linear infinite;
+}
+@keyframes authspin{to{transform:rotate(360deg);}}
+
 .footer-game{text-align:center;padding:28px 16px 20px;border-top:1px solid rgba(255,255,255,.07);color:#6b6b8a;font-family:'Nunito',sans-serif;font-size:12px;line-height:1.8;background:#0e0e1a;width:100%;}
 .footer-game .footer-main{margin-bottom:10px;color:#6b6b8a;}
 .footer-game .footer-main span{color:#a78bfa;}
@@ -240,7 +281,24 @@ body{background:#111;display:flex;flex-direction:column;align-items:center;min-h
 </head>
 <body>
 
+<!-- LOADING mientras verifica sesión — oculto cuando auth valida -->
+<div id="auth-loading">
+  <div class="spinner"></div>
+  <div>Verificando sesión...</div>
+</div>
+
 <div id="app">
+
+<!-- MINI HEADER DE USUARIO -->
+<div id="user-header">
+  <div id="user-greet">
+    <span class="u-wave">👋</span>
+    <span>Hola, </span><span class="u-name" id="userName">—</span>
+    <span class="u-role" id="userRole"></span>
+  </div>
+  <a class="hdr-btn" href="dashboard.html">📊 Dashboard</a>
+  <button class="hdr-btn logout" id="logoutBtn">↪ Salir</button>
+</div>
 
 <!-- SETUP -->
 <div id="setup">
@@ -363,14 +421,14 @@ body{background:#111;display:flex;flex-direction:column;align-items:center;min-h
     </div>
   </div>
 
-  <a class="back-link" href="index.html">← Volver al inicio</a>
+  <a class="back-link" href="dashboard.html">← Volver al dashboard</a>
 </div>
 
 <!-- GAME -->
 <div id="game">
   <div id="track-wrap">
     <img src="assets/chars/nubeinicio.gif" id="nube-inicio" style="position:absolute;top:2%;left:3%;width:clamp(40px,7vw,70px);z-index:10;pointer-events:none;"/>
-    <img src="assets/chars/nube final.gif" id="nube-final" style="position:absolute;top:2%;right:1%;width:clamp(40px,7vw,70px);z-index:10;pointer-events:none;"/>
+    <img src="assets/chars/nubefinal.gif" id="nube-final" style="position:absolute;top:2%;right:1%;width:clamp(40px,7vw,70px);z-index:10;pointer-events:none;"/>
     <div id="track">
       <div class="t-start"></div>
       <div id="lanes-el"></div>
@@ -407,11 +465,80 @@ body{background:#111;display:flex;flex-direction:column;align-items:center;min-h
     <button class="ov-btn" onclick="initGame()">🔄 Nueva carrera</button>
     <button class="ov-btn sec" onclick="backToSetup()">⚙️ Cambiar opciones</button>
   </div>
-  <a class="back-link" href="index.html">← Volver al inicio</a>
+  <a class="back-link" href="dashboard.html">← Volver al dashboard</a>
 </div>
 
 </div>
 
+<!-- ══════════════════════════════════════════════ -->
+<!-- AUTH + FIRESTORE (módulo ES) -->
+<!-- ══════════════════════════════════════════════ -->
+<script type="module">
+import { requireAuth, logout, getDisplayName, getRoleLabel } from './js/auth.js';
+import { db } from './js/firebase-config.js';
+import {
+  collection, addDoc, doc, updateDoc, increment, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// ── PROTECCIÓN DE RUTA ──
+// Si no hay sesión, auth.js redirige automáticamente a login.html
+let currentUser = null;
+try {
+  currentUser = await requireAuth();
+} catch(err){
+  // requireAuth ya redirigió, aquí no hacemos nada
+  throw err;
+}
+
+// Guardamos el usuario en window para uso desde scripts clásicos
+window.__currentUser = currentUser;
+
+// ── LLENAR MINI HEADER ──
+document.getElementById('userName').textContent = getDisplayName(currentUser);
+document.getElementById('userRole').textContent = getRoleLabel(currentUser.rol);
+
+// ── BOTÓN SALIR ──
+document.getElementById('logoutBtn').addEventListener('click', async ()=>{
+  if(confirm('¿Cerrar sesión?')){
+    await logout('index.html');
+  }
+});
+
+// ── OCULTAR LOADING ──
+document.getElementById('auth-loading').style.display='none';
+
+// ── GUARDAR PARTIDA EN FIRESTORE ──
+// Esta función se llama desde el script clásico (ver window.savePartida)
+window.__savePartidaToFirestore = async function(data){
+  if(!currentUser || !currentUser.uid) return;
+  try {
+    // 1. Guardar en subcolección users/{uid}/partidas
+    const partidasRef = collection(db, 'users', currentUser.uid, 'partidas');
+    await addDoc(partidasRef, {
+      ...data,
+      creadoEn: serverTimestamp()
+    });
+
+    // 2. Actualizar métricas agregadas en users/{uid}.stats
+    const userRef = doc(db, 'users', currentUser.uid);
+    await updateDoc(userRef, {
+      'stats.ultimoAcceso': serverTimestamp(),
+      'stats.totalPartidas': increment(1),
+      'stats.tiempoTotalSegundos': increment(data.duracionSegundos || 0),
+      [`stats.juegosJugados.${data.juego}`]: increment(1)
+    });
+
+    console.log('✓ Partida guardada en Firestore');
+  } catch(err){
+    console.warn('No se pudo guardar partida en Firestore:', err);
+    // Silencioso: no bloqueamos la experiencia del juego si falla
+  }
+};
+</script>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- SCRIPT ORIGINAL DEL JUEGO (sin cambios de lógica) -->
+<!-- ══════════════════════════════════════════════ -->
 <script>
 // GIFs para la PISTA (terminan en car) y su equivalente para el PODIO
 const CHARS = [
@@ -476,6 +603,7 @@ let players=[],currentIdx=0,finished=[];
 let currentA=0,currentB=0,diceRolled=false;
 let timerInterval=null,timerLeft=10;
 let specialTiles=[];
+let gameStartTime=0; // Para medir duración de la partida
 
 // ── AUDIO ──
 let AC;
@@ -684,6 +812,7 @@ function initGame(){
   const ob=document.getElementById('op-badge');
   ob.textContent=OP_LABELS[cfg.op]; ob.className='op-badge badge-'+cfg.op;
   document.getElementById('grade-badge').textContent=`${GRADE_CFG[cfg.grade].label} · ⏱️${GRADE_TIMER[cfg.grade]}s`;
+  gameStartTime = Date.now(); // Marcar inicio para medir duración
   genSpecialTiles(); buildLanes(); buildScoreboard();
   setTimeout(()=>{ drawSpecialTiles(); nextTurn(); },100);
 }
@@ -909,6 +1038,26 @@ function showPodium(){
     if(a.finishOrder) return -1; if(b.finishOrder) return 1; return b.pos-a.pos;
   });
   saveHistory(sorted);
+  // ── Registrar partida en Firestore (automático, silencioso) ──
+  try {
+    const duracion = Math.floor((Date.now() - gameStartTime) / 1000);
+    const partidaData = {
+      juego: 'multiplica-kart',
+      grado: GRADE_CFG[cfg.grade].label,
+      gradoNum: cfg.grade,
+      operacion: OP_LABELS[cfg.op],
+      operacionCode: cfg.op,
+      meta: cfg.goal,
+      numJugadores: players.length,
+      ganador: sorted[0]?.name || '—',
+      duracionSegundos: duracion,
+      jugadores: players.map(p=>({ nombre:p.name, pos:p.pos, orden:p.finishOrder }))
+    };
+    if(typeof window.__savePartidaToFirestore === 'function'){
+      window.__savePartidaToFirestore(partidaData);
+    }
+  } catch(e){ console.warn('No se pudo registrar partida:', e); }
+
   const medals=['🥇','🥈','🥉'],hs=['pb1','pb2','pb3'];
   const pod=document.getElementById('podium'); pod.innerHTML='';
   [1,0,2].forEach(rank=>{
@@ -968,7 +1117,7 @@ list.appendChild(buildPlayerRow(1));
   <div class="footer-main">Hecho con ❤️ para el salón de clases · <span>HTML puro · Sin instalación · Gratis</span></div>
   <div class="footer-game-brand">
     <span class="footer-game-name">EduGamePlay</span>
-    <span class="footer-game-ver">v 0.1</span>
+    <span class="footer-game-ver">v 0.2</span>
   </div>
   <div class="footer-game-dev">Desarrollado por <strong>Juan Pariona</strong></div>
   <div class="footer-game-copy">© 2026 Juan Pariona · Todos los derechos reservados</div>
