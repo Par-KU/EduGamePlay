@@ -351,7 +351,7 @@ footer span{color:var(--purple);}
 
 <div class="stats-bar">
   <div class="stat"><div class="stat-num">15</div><div class="stat-lbl">Juegos planeados</div></div>
-  <div class="stat"><div class="stat-num">2</div><div class="stat-lbl">Disponibles</div></div>
+  <div class="stat"><div class="stat-num">3</div><div class="stat-lbl">Disponibles</div></div>
   <div class="stat"><div class="stat-num">6</div><div class="stat-lbl">Materias</div></div>
   <div class="stat"><div class="stat-num">1°–6°</div><div class="stat-lbl">Grados</div></div>
 </div>
@@ -429,7 +429,7 @@ footer span{color:var(--purple);}
   <div class="progress-wrap">
     <div class="progress-text">Progreso de la colección</div>
     <div class="progress-bar"><div class="progress-fill" id="pfill"></div></div>
-    <div class="progress-pct">2 / 15</div>
+    <div class="progress-pct">3 / 15</div>
   </div>
 
   <div class="section-group" data-materia="mat">
@@ -442,7 +442,7 @@ footer span{color:var(--purple);}
         <div class="card-desc">Resuelve fracciones para abrir puertas y escapar de una mazmorra.</div>
         <span class="card-tag">Fracciones · 3°-6°</span>
       </a>
-      <div class="game-card card-soon c-mat" data-game="duelo-ecuaciones" data-materia="mat" data-grados="5,6" data-ready="0"><span class="badge-soon">Próximamente</span><div class="card-icon">⚔️</div><div class="card-title">Duelo de ecuaciones</div><div class="card-desc">2 jugadores resuelven ecuaciones; el más rápido ataca al rival.</div><span class="card-tag">Álgebra · 5°-6°</span></div>
+      <a class="game-card c-mat" href="duelo-ecuaciones.html" data-game="duelo-ecuaciones" data-materia="mat" data-grados="5,6" data-ready="1"><span class="badge-ready">● Disponible</span><div class="card-icon">⚔️</div><div class="card-title">Duelo de ecuaciones</div><div class="card-desc">2 jugadores resuelven ecuaciones; el más rápido ataca al rival.</div><span class="card-tag">Álgebra · 5°-6°</span></a>
       <div class="game-card card-soon c-mat" data-game="constructor-figuras" data-materia="mat" data-grados="2,3,4,5,6" data-ready="0"><span class="badge-soon">Próximamente</span><div class="card-icon">📐</div><div class="card-title">Constructor de figuras</div><div class="card-desc">Arrastra ángulos y lados para construir figuras con medidas exactas.</div><span class="card-tag">Geometría · 2°-6°</span></div>
     </div>
   </div>
@@ -525,7 +525,7 @@ for(let i=0;i<count;i++){
   s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${sz}px;height:${sz}px;--dur:${2+Math.random()*4}s;--delay:${Math.random()*5}s;`;
   document.body.appendChild(s);
 }
-setTimeout(()=>{ document.getElementById('pfill').style.width='13.3%'; },400);
+setTimeout(()=>{ document.getElementById('pfill').style.width='20%'; },400);
 </script>
 
 <!-- ═══ SCRIPT DE AUTH (agregado v0.2) ═══ -->
