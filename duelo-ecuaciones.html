@@ -779,8 +779,8 @@ function genEquation6(){
 function formatEquation(eqStr){
   // Renderizar en HTML con colores
   return eqStr
-    .replace(/x/g,'<span class="x-var">x</span>')
-    .replace(/=/g,'<span class="equals">=</span>');
+    .replace(/\b(x)\b/g, '<span class="x-var">x</span>')
+    .replace(/=/g, '<span class="equals">=</span>');
 }
 
 // ── BATTLE FLOW ──
