@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-09YP073NX2"></script>
+<script>
+window.dataLayer=window.dataLayer||[];
+function gtag(){dataLayer.push(arguments);}
+gtag("js",new Date());
+gtag("config","G-09YP073NX2");
+</script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Panel de Administración — EduGamePlay</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0e0e1a;--bg2:#16162a;--bg3:#1e1e38;
+  --accent:#facc15;--accent2:#f97316;
+  --purple:#a78bfa;--green:#4ade80;--blue:#60a5fa;--pink:#f472b6;--red:#f87171;
+  --text:#f1f0e8;--muted:#6b6b8a;
+  --border:rgba(255,255,255,0.07);
+  --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── LOADING ── */
+#auth-loading{
+  position:fixed;inset:0;background:var(--bg);z-index:9999;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;
+  color:var(--muted);font-size:13px;
+}
+#auth-loading .spinner{
+  width:40px;height:40px;border:3px solid rgba(167,139,250,.2);
+  border-top-color:var(--purple);border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── TOP NAV ── */
+.top-nav{
+  position:sticky;top:0;z-index:50;background:rgba(14,14,26,.95);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);padding:12px 16px;
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+}
+.nav-brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1;}
+.nav-logo{
+  font-family:'Fredoka One',cursive;font-size:clamp(18px,4.5vw,22px);line-height:1;white-space:nowrap;
+  background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 50%,var(--pink) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.nav-badge{
+  font-size:10px;background:rgba(250,204,21,.15);color:var(--accent);
+  border:1px solid rgba(250,204,21,.3);border-radius:20px;padding:2px 8px;
+  font-weight:800;letter-spacing:1px;white-space:nowrap;
+}
+.nav-user{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.nav-user-name{font-size:12px;color:var(--muted);white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis;}
+.nav-user-name strong{color:var(--text);}
+.nav-btn{
+  background:transparent;border:1px solid var(--border);color:var(--text);
+  font-family:'Nunito',sans-serif;font-size:12px;font-weight:600;
+  padding:6px 10px;border-radius:8px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:4px;text-decoration:none;
+  -webkit-tap-highlight-color:transparent;
+}
+.nav-btn:active{background:rgba(255,255,255,.05);}
+.nav-btn.danger{border-color:rgba(248,113,113,.3);color:var(--red);}
+
+@media(max-width:620px){
+  .nav-user-name{display:none;}
+  .nav-badge{display:none;}
+}
+
+/* ── TABS ── */
+.tabs{
+  display:flex;gap:4px;padding:10px 16px 0;
+  border-bottom:1px solid var(--border);background:var(--bg);
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+}
+.tab{
+  background:transparent;border:none;color:var(--muted);
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;
+  padding:10px 14px;cursor:pointer;white-space:nowrap;
+  border-bottom:2px solid transparent;transition:color .15s,border-color .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab:hover:not(.active){color:var(--text);}
+
+/* ── MAIN ── */
+main{max-width:1200px;margin:0 auto;padding:20px 16px 60px;}
+
+/* ── STATS CARDS ── */
+.stats-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));
+  gap:12px;margin-bottom:24px;
+}
+.stat-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:14px 16px;
+}
+.stat-card-label{font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;}
+.stat-card-value{font-family:'Fredoka One',cursive;font-size:28px;line-height:1;}
+.stat-card-sub{font-size:11px;color:var(--muted);margin-top:4px;}
+.sv-accent{color:var(--accent);}
+.sv-green{color:var(--green);}
+.sv-blue{color:var(--blue);}
+.sv-purple{color:var(--purple);}
+.sv-pink{color:var(--pink);}
+
+/* ── TOOLBAR ── */
+.toolbar{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:14px;margin-bottom:12px;
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+}
+.search-wrap{flex:1;min-width:200px;position:relative;}
+.search-wrap input{
+  width:100%;padding:10px 14px 10px 36px;background:rgba(0,0,0,.3);
+  border:1.5px solid var(--border);border-radius:10px;
+  color:var(--text);font-family:'Nunito',sans-serif;font-size:13px;
+  outline:none;min-height:42px;transition:border-color .15s;
+}
+.search-wrap input:focus{border-color:var(--purple);}
+.search-wrap::before{
+  content:'🔍';position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  font-size:13px;opacity:.6;pointer-events:none;
+}
+.filter-chips{display:flex;gap:6px;flex-wrap:wrap;}
+.chip{
+  background:rgba(255,255,255,.04);border:1.5px solid var(--border);
+  color:var(--muted);font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;
+  padding:8px 12px;border-radius:10px;cursor:pointer;
+  white-space:nowrap;-webkit-tap-highlight-color:transparent;transition:all .15s;
+}
+.chip.active{background:rgba(167,139,250,.15);border-color:var(--purple);color:var(--purple);}
+.chip:hover:not(.active){color:var(--text);}
+.btn-primary{
+  background:var(--accent);color:#1a1a00;border:none;border-bottom:3px solid #b8960f;
+  font-family:'Fredoka One',cursive;font-size:13px;padding:10px 18px;
+  border-radius:10px;cursor:pointer;white-space:nowrap;min-height:42px;
+  -webkit-tap-highlight-color:transparent;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.btn-primary:active{transform:translateY(2px);border-bottom-width:1px;}
+
+/* ── TABLE ── */
+.users-table-wrap{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;
+}
+.users-table-header{
+  display:grid;
+  grid-template-columns:1fr 120px 100px 100px 90px;
+  gap:10px;padding:12px 14px;
+  background:rgba(167,139,250,.05);border-bottom:1px solid var(--border);
+  font-size:10px;color:var(--purple);font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
+}
+.users-table-header > div:last-child{text-align:right;}
+
+.user-row{
+  display:grid;
+  grid-template-columns:1fr 120px 100px 100px 90px;
+  gap:10px;padding:12px 14px;align-items:center;
+  border-bottom:1px solid var(--border);
+  transition:background .12s;
+}
+.user-row:last-child{border-bottom:none;}
+.user-row:hover{background:rgba(255,255,255,.02);}
+.user-cell-name{overflow:hidden;min-width:0;}
+.user-cell-name .name{color:var(--text);font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.user-cell-name .email{color:var(--muted);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.role-pill{
+  display:inline-block;font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;
+  letter-spacing:.5px;white-space:nowrap;
+}
+.role-admin{background:rgba(250,204,21,.15);color:var(--accent);border:1px solid rgba(250,204,21,.3);}
+.role-docente{background:rgba(96,165,250,.15);color:var(--blue);border:1px solid rgba(96,165,250,.3);}
+.role-alumno{background:rgba(74,222,128,.15);color:var(--green);border:1px solid rgba(74,222,128,.3);}
+.status-pill{font-size:10px;font-weight:700;}
+.status-active{color:var(--green);}
+.status-inactive{color:var(--muted);}
+.row-actions{display:flex;gap:4px;justify-content:flex-end;}
+.row-btn{
+  background:transparent;border:1px solid var(--border);color:var(--muted);
+  font-size:14px;width:32px;height:32px;border-radius:6px;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;
+  -webkit-tap-highlight-color:transparent;transition:all .12s;
+}
+.row-btn:hover{color:var(--text);border-color:var(--purple);}
+.row-btn.danger:hover{color:var(--red);border-color:rgba(248,113,113,.3);}
+
+.empty-state{
+  padding:40px 20px;text-align:center;color:var(--muted);font-size:13px;
+}
+.empty-state .icon{font-size:40px;margin-bottom:10px;opacity:.4;}
+
+/* ── RESPONSIVE TABLE (cards en móvil) ── */
+@media(max-width:680px){
+  .users-table-header{display:none;}
+  .user-row{
+    grid-template-columns:1fr auto;
+    grid-template-areas:
+      "name actions"
+      "role role"
+      "status status";
+    gap:8px;padding:12px;
+    border:1px solid var(--border);border-radius:10px;margin-bottom:8px;
+    background:rgba(255,255,255,.02);
+  }
+  .user-row:hover{background:rgba(255,255,255,.02);}
+  .user-cell-name{grid-area:name;}
+  .user-cell-role{grid-area:role;}
+  .user-cell-status{grid-area:status;font-size:11px;}
+  .user-cell-created{display:none;}
+  .row-actions{grid-area:actions;}
+  .users-table-wrap{background:transparent;border:none;}
+}
+
+/* ── MODAL ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);
+  z-index:100;align-items:center;justify-content:center;padding:16px;
+}
+.modal-overlay.show{display:flex;}
+.modal-box{
+  background:var(--bg2);border:1px solid var(--border);border-radius:16px;
+  padding:clamp(20px,4vw,28px);max-width:480px;width:100%;
+  max-height:90vh;overflow-y:auto;
+}
+.modal-title{
+  font-family:'Fredoka One',cursive;font-size:20px;color:var(--text);
+  margin-bottom:6px;display:flex;align-items:center;gap:8px;
+}
+.modal-sub{color:var(--muted);font-size:13px;margin-bottom:20px;line-height:1.5;}
+
+.form-group{margin-bottom:14px;}
+.form-label{
+  display:block;font-size:11px;font-weight:800;color:var(--purple);
+  letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;
+}
+.form-hint{font-size:11px;color:var(--muted);margin-top:4px;font-style:italic;}
+.form-input,.form-select{
+  width:100%;padding:11px 14px;
+  font-family:'Nunito',sans-serif;font-size:14px;
+  background:rgba(0,0,0,.3);color:var(--text);
+  border:1.5px solid var(--border);border-radius:10px;
+  outline:none;min-height:44px;transition:border-color .15s;
+}
+.form-input:focus,.form-select:focus{border-color:var(--purple);background:rgba(0,0,0,.5);}
+.form-select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%236b6b8a' d='M6 8L0 0h12z'/></svg>");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:480px){.form-row{grid-template-columns:1fr;}}
+
+.password-wrap{position:relative;}
+.password-toggle{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  background:transparent;border:none;cursor:pointer;
+  font-size:16px;color:var(--muted);padding:6px;
+}
+.gen-pw-btn{
+  background:transparent;border:1px dashed var(--border);color:var(--muted);
+  font-family:'Nunito',sans-serif;font-size:11px;padding:6px 10px;
+  border-radius:6px;cursor:pointer;margin-top:6px;
+  -webkit-tap-highlight-color:transparent;
+}
+.gen-pw-btn:hover{color:var(--text);border-color:var(--purple);}
+
+.alert{
+  padding:10px 14px;border-radius:10px;
+  font-size:12px;line-height:1.5;margin-bottom:14px;display:none;
+}
+.alert.show{display:block;}
+.alert.error{background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);color:var(--red);}
+.alert.success{background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.3);color:var(--green);}
+.alert.warning{background:rgba(250,204,21,.12);border:1px solid rgba(250,204,21,.3);color:var(--accent);}
+.alert.info{background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.3);color:var(--purple);}
+
+.modal-actions{display:flex;gap:8px;margin-top:18px;}
+.modal-btn{
+  flex:1;padding:12px;border-radius:10px;
+  font-family:'Fredoka One',cursive;font-size:14px;cursor:pointer;
+  min-height:48px;border:none;
+  -webkit-tap-highlight-color:transparent;
+}
+.modal-btn.primary{background:var(--accent);color:#1a1a00;border-bottom:3px solid #b8960f;}
+.modal-btn.primary:active{transform:translateY(2px);border-bottom-width:1px;}
+.modal-btn.secondary{background:transparent;border:1.5px solid var(--border);color:var(--muted);}
+.modal-btn.danger{background:var(--red);color:#fff;border-bottom:3px solid #991b1b;}
+.modal-btn:disabled{opacity:.5;cursor:not-allowed;}
+.modal-btn .spinner{
+  display:inline-block;width:14px;height:14px;
+  border:2px solid rgba(0,0,0,.3);border-top-color:#000;
+  border-radius:50%;animation:spin .6s linear infinite;margin-right:6px;vertical-align:middle;
+}
+
+/* Modal credenciales generadas */
+.creds-box{
+  background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.3);
+  border-radius:10px;padding:14px;margin-bottom:14px;
+}
+.creds-item{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:13px;}
+.creds-label{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px;}
+.creds-value{color:var(--text);font-family:'Courier New',monospace;font-weight:700;}
+.copy-btn{
+  background:transparent;border:1px solid var(--border);color:var(--muted);
+  font-size:11px;padding:4px 8px;border-radius:6px;cursor:pointer;margin-left:8px;
+}
+.copy-btn:hover{color:var(--text);border-color:var(--purple);}
+
+/* Tab content */
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* Coming soon */
+.coming-soon{
+  background:var(--bg2);border:1px dashed var(--border);border-radius:12px;
+  padding:40px 20px;text-align:center;color:var(--muted);
+}
+.coming-soon .icon{font-size:48px;margin-bottom:10px;opacity:.6;}
+.coming-soon .title{font-family:'Fredoka One',cursive;color:var(--text);font-size:18px;margin-bottom:6px;}
+
+/* ── FOOTER MINI ── */
+.footer-mini{text-align:center;padding:20px 16px 10px;color:var(--muted);font-size:11px;line-height:1.6;}
+.footer-mini-brand{
+  font-family:'Fredoka One',cursive;font-size:13px;
+  background:linear-gradient(135deg,var(--accent),var(--pink));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="auth-loading">
+  <div class="spinner"></div>
+  <div>Verificando sesión...</div>
+</div>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <div class="nav-brand">
+    <div class="nav-logo">EduGamePlay</div>
+    <span class="nav-badge">ADMIN</span>
+  </div>
+  <div class="nav-user">
+    <span class="nav-user-name">👑 <strong id="adminName">—</strong></span>
+    <a class="nav-btn" href="dashboard.html" title="Dashboard">🎮</a>
+    <button class="nav-btn danger" id="logoutBtn" title="Cerrar sesión">↪</button>
+  </div>
+</nav>
+
+<!-- TABS -->
+<div class="tabs" id="tabs">
+  <button class="tab active" data-tab="users">👥 Usuarios</button>
+  <button class="tab" data-tab="stats">📊 Estadísticas</button>
+  <button class="tab" data-tab="sessions">🟢 Sesiones</button>
+</div>
+
+<main>
+
+<!-- TAB: USUARIOS -->
+<div class="tab-content active" id="tab-users">
+
+  <!-- Stats quick -->
+  <div class="stats-grid" id="quickStats">
+    <div class="stat-card">
+      <div class="stat-card-label">Total usuarios</div>
+      <div class="stat-card-value sv-accent" id="stTotal">—</div>
+      <div class="stat-card-sub">Registrados</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">👑 Admins</div>
+      <div class="stat-card-value sv-accent" id="stAdmins">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">🎓 Docentes</div>
+      <div class="stat-card-value sv-blue" id="stDocentes">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">📚 Alumnos</div>
+      <div class="stat-card-value sv-green" id="stAlumnos">—</div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <input type="text" id="searchInput" placeholder="Buscar por nombre o email..." autocomplete="off"/>
+    </div>
+    <div class="filter-chips">
+      <button class="chip active" data-filter="all">Todos</button>
+      <button class="chip" data-filter="admin">👑 Admins</button>
+      <button class="chip" data-filter="docente">🎓 Docentes</button>
+      <button class="chip" data-filter="alumno">📚 Alumnos</button>
+      <button class="chip" data-filter="inactive">💤 Inactivos</button>
+    </div>
+    <button class="btn-primary" id="openCreateBtn">➕ Nuevo usuario</button>
+  </div>
+
+  <!-- Tabla -->
+  <div class="users-table-wrap">
+    <div class="users-table-header">
+      <div>Usuario</div>
+      <div>Rol</div>
+      <div>Estado</div>
+      <div>Creado</div>
+      <div>Acciones</div>
+    </div>
+    <div id="usersList">
+      <div class="empty-state">
+        <div class="icon">⏳</div>
+        <div>Cargando usuarios...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: ESTADISTICAS -->
+<div class="tab-content" id="tab-stats">
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-card-label">Partidas totales</div>
+      <div class="stat-card-value sv-accent" id="stPartidas">—</div>
+      <div class="stat-card-sub">De todos los usuarios</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Tiempo total jugado</div>
+      <div class="stat-card-value sv-green" id="stTiempo">—</div>
+      <div class="stat-card-sub">Horas acumuladas</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Juego más usado</div>
+      <div class="stat-card-value sv-purple" style="font-size:16px;line-height:1.3;" id="stTopGame">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Usuarios activos</div>
+      <div class="stat-card-value sv-blue" id="stActivos">—</div>
+      <div class="stat-card-sub">Con al menos 1 partida</div>
+    </div>
+  </div>
+
+  <div class="users-table-wrap" style="margin-bottom:16px;">
+    <div style="padding:14px;border-bottom:1px solid var(--border);">
+      <div style="font-family:'Fredoka One',cursive;font-size:16px;">🏆 Top 10 usuarios más activos</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;">Por partidas jugadas</div>
+    </div>
+    <div id="topUsersList">
+      <div class="empty-state">
+        <div class="icon">⏳</div>
+        <div>Calculando...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="users-table-wrap">
+    <div style="padding:14px;border-bottom:1px solid var(--border);">
+      <div style="font-family:'Fredoka One',cursive;font-size:16px;">🎮 Popularidad de juegos</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;">Partidas por juego</div>
+    </div>
+    <div id="topGamesList">
+      <div class="empty-state">
+        <div class="icon">⏳</div>
+        <div>Calculando...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: SESIONES -->
+<div class="tab-content" id="tab-sessions">
+  <div class="coming-soon">
+    <div class="icon">🟢</div>
+    <div class="title">Sesiones en vivo</div>
+    <div>Próximamente: verás en tiempo real quién está conectado,<br>desde dónde y qué juego está jugando.</div>
+    <div style="margin-top:14px;font-size:11px;color:var(--muted);">
+      Requiere implementar el sistema de presencia con Realtime Database.<br>
+      Lo activaremos en la siguiente fase.
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- ═══════════════════════════════ -->
+<!-- MODAL: CREAR USUARIO -->
+<!-- ═══════════════════════════════ -->
+<div class="modal-overlay" id="modalCreate">
+  <div class="modal-box">
+    <div class="modal-title">➕ Nuevo usuario</div>
+    <div class="modal-sub">Crea una cuenta para un alumno, docente u otro administrador. Guarda las credenciales para entregárselas al usuario.</div>
+
+    <div class="alert" id="createAlert"></div>
+
+    <form id="createForm" autocomplete="off">
+      <div class="form-group">
+        <label class="form-label">Nombre completo</label>
+        <input class="form-input" type="text" id="cNombre" placeholder="Ej: Juan Pérez García" required autocomplete="off"/>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Rol</label>
+          <select class="form-select" id="cRol" required>
+            <option value="alumno">📚 Alumno</option>
+            <option value="docente">🎓 Docente</option>
+            <option value="admin">👑 Administrador</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Correo</label>
+          <input class="form-input" type="email" id="cEmail" placeholder="juan@escuela.com" required autocomplete="off"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <div class="password-wrap">
+          <input class="form-input" type="text" id="cPassword" placeholder="Mínimo 6 caracteres" required minlength="6" autocomplete="off" style="padding-right:44px;"/>
+          <button type="button" class="password-toggle" id="cPwToggle">👁️</button>
+        </div>
+        <button type="button" class="gen-pw-btn" id="cGenPw">🎲 Generar automáticamente</button>
+        <div class="form-hint">El usuario podrá iniciar sesión con estas credenciales. Si olvida la contraseña podrá recuperarla desde el login.</div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="modal-btn secondary" id="cCancel">Cancelar</button>
+        <button type="submit" class="modal-btn primary" id="cSubmit">Crear</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ -->
+<!-- MODAL: CREDENCIALES (post-creación) -->
+<!-- ═══════════════════════════════ -->
+<div class="modal-overlay" id="modalCreds">
+  <div class="modal-box">
+    <div class="modal-title">✅ Usuario creado</div>
+    <div class="modal-sub">Guarda o copia estas credenciales para entregárselas al usuario. Esta ventana solo se mostrará ahora.</div>
+
+    <div class="creds-box">
+      <div class="creds-item">
+        <div>
+          <div class="creds-label">Correo</div>
+          <div class="creds-value" id="credEmail">—</div>
+        </div>
+        <button class="copy-btn" data-copy="credEmail">📋 Copiar</button>
+      </div>
+      <div class="creds-item" style="border-top:1px dashed rgba(255,255,255,.08);padding-top:10px;margin-top:6px;">
+        <div>
+          <div class="creds-label">Contraseña</div>
+          <div class="creds-value" id="credPassword">—</div>
+        </div>
+        <button class="copy-btn" data-copy="credPassword">📋 Copiar</button>
+      </div>
+    </div>
+
+    <button class="copy-btn" id="copyBothBtn" style="width:100%;padding:10px;margin-bottom:10px;">📋 Copiar ambos</button>
+
+    <div class="alert info show" style="font-size:12px;">
+      💡 El usuario deberá completar su perfil (país, edad, etc.) la primera vez que inicie sesión.
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-btn primary" id="credsClose">Entendido</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ -->
+<!-- MODAL: EDITAR USUARIO -->
+<!-- ═══════════════════════════════ -->
+<div class="modal-overlay" id="modalEdit">
+  <div class="modal-box">
+    <div class="modal-title">✏️ Editar usuario</div>
+    <div class="modal-sub">Modifica el nombre o el rol del usuario. El correo no se puede cambiar.</div>
+
+    <div class="alert" id="editAlert"></div>
+
+    <form id="editForm" autocomplete="off">
+      <input type="hidden" id="eUid"/>
+      <div class="form-group">
+        <label class="form-label">Nombre completo</label>
+        <input class="form-input" type="text" id="eNombre" required/>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Rol</label>
+          <select class="form-select" id="eRol" required>
+            <option value="alumno">📚 Alumno</option>
+            <option value="docente">🎓 Docente</option>
+            <option value="admin">👑 Administrador</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Estado</label>
+          <select class="form-select" id="eActivo" required>
+            <option value="true">✓ Activo</option>
+            <option value="false">✗ Inactivo</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Correo (solo lectura)</label>
+        <input class="form-input" type="email" id="eEmail" readonly style="opacity:.6;"/>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="modal-btn secondary" id="eCancel">Cancelar</button>
+        <button type="submit" class="modal-btn primary" id="eSubmit">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ -->
+<!-- MODAL: CONFIRMAR ELIMINAR -->
+<!-- ═══════════════════════════════ -->
+<div class="modal-overlay" id="modalDelete">
+  <div class="modal-box">
+    <div class="modal-title" style="color:var(--red);">🗑️ Eliminar usuario</div>
+    <div class="modal-sub" id="delSub">¿Estás seguro? Esta acción no se puede deshacer.</div>
+
+    <div class="alert warning show" style="font-size:12px;">
+      ⚠️ Se borrará el documento del usuario en Firestore junto con su historial de partidas.<br><br>
+      <strong>Nota técnica:</strong> La cuenta en Firebase Authentication no se puede eliminar desde el panel (limitación del lado cliente). Para eliminarla completamente, tendrás que hacerlo desde la consola de Firebase.
+    </div>
+
+    <div class="alert" id="delAlert"></div>
+
+    <div class="modal-actions">
+      <button type="button" class="modal-btn secondary" id="dCancel">Cancelar</button>
+      <button type="button" class="modal-btn danger" id="dConfirm">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer-mini">
+  <div><span class="footer-mini-brand">EduGamePlay</span> · Panel de Administración · v 0.2</div>
+  <div>© 2026 Juan Pariona</div>
+</div>
+
+<!-- Script principal del panel -->
+<script type="module" src="./js/admin.js"></script>
+
+</body>
+</html>
