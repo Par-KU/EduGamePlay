@@ -169,6 +169,146 @@ footer span{color:var(--purple);}
   #user-greet{font-size:12px;}
   .hdr-btn{padding:5px 10px;font-size:11px;}
 }
+
+/* ═══ TABS + FILTROS + BANNER (agregado v0.3) ═══ */
+
+/* Banner de bienvenida */
+.welcome-banner{
+  max-width:1100px;margin:18px auto 0;padding:14px 18px;
+  background:linear-gradient(135deg,rgba(167,139,250,.1),rgba(244,114,182,.08));
+  border:1px solid rgba(167,139,250,.3);
+  border-radius:var(--radius);
+  display:flex;align-items:flex-start;gap:12px;
+  position:relative;z-index:2;
+}
+.welcome-banner.hidden{display:none;}
+.welcome-banner-icon{font-size:28px;flex-shrink:0;line-height:1;}
+.welcome-banner-body{flex:1;min-width:0;}
+.welcome-banner-title{
+  font-family:'Fredoka One',cursive;font-size:15px;
+  color:var(--purple);margin-bottom:4px;
+}
+.welcome-banner-text{font-size:12.5px;color:var(--muted);line-height:1.6;}
+.welcome-banner-text strong{color:var(--text);}
+.welcome-banner-close{
+  background:transparent;border:none;color:var(--muted);
+  font-size:20px;cursor:pointer;padding:2px 8px;line-height:1;
+  border-radius:6px;flex-shrink:0;
+  -webkit-tap-highlight-color:transparent;
+}
+.welcome-banner-close:hover{color:var(--text);background:rgba(255,255,255,.04);}
+
+/* Tabs */
+.tabs-container{
+  max-width:1100px;margin:22px auto 0;padding:0 16px;
+  display:flex;gap:8px;
+  position:relative;z-index:2;
+}
+.tab-btn{
+  flex:1;max-width:280px;
+  background:var(--bg2);border:1.5px solid var(--border);
+  border-radius:var(--radius) var(--radius) 0 0;
+  padding:14px 18px;cursor:pointer;
+  font-family:'Fredoka One',cursive;font-size:clamp(13px,3.5vw,16px);
+  color:var(--muted);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:all .2s;border-bottom:none;
+  -webkit-tap-highlight-color:transparent;
+  position:relative;
+}
+.tab-btn .tab-count{
+  font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;
+  background:rgba(255,255,255,.06);color:var(--muted);
+  padding:2px 8px;border-radius:12px;letter-spacing:.5px;
+}
+.tab-btn:hover{background:var(--bg3);color:var(--text);}
+.tab-btn.active{
+  background:var(--bg2);color:var(--accent);
+  border-color:var(--accent);border-bottom:2px solid var(--bg2);
+  margin-bottom:-2px;
+}
+.tab-btn.active .tab-count{background:rgba(250,204,21,.2);color:var(--accent);}
+.tab-btn .tab-soon-pill{
+  position:absolute;top:-6px;right:-6px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff;font-family:'Nunito',sans-serif;font-size:9px;font-weight:800;
+  padding:2px 7px;border-radius:20px;letter-spacing:.5px;
+  border:2px solid var(--bg);
+}
+
+/* Filtros */
+.filters-panel{
+  background:var(--bg2);border:1.5px solid var(--border);
+  border-top:none;border-radius:0 0 var(--radius) var(--radius);
+  padding:16px 18px;margin-bottom:28px;
+  display:grid;grid-template-columns:1fr 1fr auto;gap:14px;align-items:end;
+}
+@media(max-width:640px){
+  .filters-panel{grid-template-columns:1fr 1fr;}
+  .filters-panel .filter-check{grid-column:1/-1;justify-self:start;}
+}
+@media(max-width:420px){
+  .filters-panel{grid-template-columns:1fr;}
+}
+.filter-group{display:flex;flex-direction:column;gap:6px;}
+.filter-label{
+  font-size:10px;font-weight:800;color:var(--purple);
+  letter-spacing:1.5px;text-transform:uppercase;
+}
+.filter-select{
+  width:100%;padding:10px 32px 10px 12px;
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;
+  background:rgba(0,0,0,.3);color:var(--text);
+  border:1px solid var(--border);border-radius:8px;
+  outline:none;cursor:pointer;min-height:40px;
+  appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%236b6b8a' d='M6 8L0 0h12z'/></svg>");
+  background-repeat:no-repeat;background-position:right 12px center;
+}
+.filter-select:focus{border-color:var(--purple);}
+.filter-check{
+  display:flex;align-items:center;gap:8px;cursor:pointer;
+  padding:10px 14px;background:rgba(74,222,128,.08);
+  border:1px solid rgba(74,222,128,.2);border-radius:8px;
+  font-size:13px;font-weight:700;color:var(--green);
+  min-height:40px;white-space:nowrap;
+  -webkit-tap-highlight-color:transparent;
+}
+.filter-check input{width:16px;height:16px;cursor:pointer;accent-color:var(--green);}
+
+/* Tab content */
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* Secundaria - estado vacío */
+.empty-coming-soon{
+  text-align:center;padding:60px 20px;
+  background:var(--bg2);border:1px dashed var(--border);
+  border-radius:var(--radius);margin-top:10px;
+}
+.empty-coming-soon .icon-big{
+  font-size:64px;margin-bottom:14px;
+  animation:float 3s ease-in-out infinite;
+}
+.empty-coming-soon h3{
+  font-family:'Fredoka One',cursive;font-size:22px;
+  color:var(--purple);margin-bottom:8px;
+}
+.empty-coming-soon p{
+  color:var(--muted);font-size:13px;line-height:1.6;max-width:440px;margin:0 auto;
+}
+
+/* Filtro: ocultar juegos no coincidentes */
+.game-card.filtered-out,
+.section-group.filtered-out{display:none;}
+
+/* Contador de resultados */
+.filter-result{
+  font-size:12px;color:var(--muted);
+  text-align:center;margin:10px 0 20px;font-style:italic;
+}
+.filter-result strong{color:var(--accent);font-style:normal;}
+.filter-result.no-results{color:var(--pink);}
 </style>
 </head>
 <body>
@@ -196,6 +336,19 @@ footer span{color:var(--purple);}
   <div class="tagline">Juegos educativos para el <span>salón de clases</span> · Sin instalación · Gratis</div>
 </header>
 
+<!-- Banner de bienvenida (cerrable) -->
+<div class="welcome-banner" id="welcomeBanner">
+  <div class="welcome-banner-icon">🎯</div>
+  <div class="welcome-banner-body">
+    <div class="welcome-banner-title">¡Elige tu aventura!</div>
+    <div class="welcome-banner-text">
+      Si eres alumno de <strong>primaria</strong>, diviértete con los juegos de tu nivel.
+      Y si ya los dominas todos, atrévete a explorar <strong>retos más complicados</strong> en los juegos de secundaria. 🚀
+    </div>
+  </div>
+  <button class="welcome-banner-close" id="closeBannerBtn" aria-label="Cerrar">✕</button>
+</div>
+
 <div class="stats-bar">
   <div class="stat"><div class="stat-num">15</div><div class="stat-lbl">Juegos planeados</div></div>
   <div class="stat"><div class="stat-num">2</div><div class="stat-lbl">Disponibles</div></div>
@@ -203,8 +356,59 @@ footer span{color:var(--purple);}
   <div class="stat"><div class="stat-num">1°–6°</div><div class="stat-lbl">Grados</div></div>
 </div>
 
+<!-- Tabs -->
+<div class="tabs-container">
+  <button class="tab-btn active" data-tab="primaria">
+    <span>🎒 Primaria</span>
+    <span class="tab-count" id="countPrim">13</span>
+  </button>
+  <button class="tab-btn" data-tab="secundaria">
+    <span>🎓 Secundaria</span>
+    <span class="tab-count" id="countSec">2</span>
+    <span class="tab-soon-pill">Próximamente</span>
+  </button>
+</div>
+
 <main>
-  <a class="hero-card" href="multiplica-kart.html">
+
+<!-- Panel de filtros -->
+<div class="filters-panel">
+  <div class="filter-group">
+    <label class="filter-label" for="filterGrado">Grado</label>
+    <select class="filter-select" id="filterGrado">
+      <option value="all">Todos los grados</option>
+      <option value="1">1° grado</option>
+      <option value="2">2° grado</option>
+      <option value="3">3° grado</option>
+      <option value="4">4° grado</option>
+      <option value="5">5° grado</option>
+      <option value="6">6° grado</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label class="filter-label" for="filterMateria">Materia</label>
+    <select class="filter-select" id="filterMateria">
+      <option value="all">Todas las materias</option>
+      <option value="mat">🔢 Matemáticas</option>
+      <option value="bio">🔬 Biología</option>
+      <option value="qui">⚗️ Química</option>
+      <option value="fis">⚡ Física</option>
+      <option value="his">🌎 Historia / Geografía</option>
+    </select>
+  </div>
+  <label class="filter-check">
+    <input type="checkbox" id="filterReady"/>
+    <span>Solo disponibles</span>
+  </label>
+</div>
+
+<!-- Contador de resultados -->
+<div class="filter-result" id="filterResult"></div>
+
+<!-- TAB: PRIMARIA -->
+<div class="tab-content active" data-tab-content="primaria">
+
+  <a class="hero-card" href="multiplica-kart.html" data-game="multiplica-kart" data-materia="mat" data-grados="1,2,3,4,5,6" data-ready="1">
     <div class="hero-left">
       <div class="hero-badge">⚡ Disponible ahora</div>
       <div class="hero-title">Multiplica Kart</div>
@@ -228,45 +432,75 @@ footer span{color:var(--purple);}
     <div class="progress-pct">2 / 15</div>
   </div>
 
-  <div class="section-head"><h2>🔢 Matemáticas y aritmética</h2><div class="section-line"></div><span class="section-tag tag-mat">4 juegos</span></div>
-  <div class="game-grid">
-    <a class="game-card c-mat" href="escape-fracciones.html">
-      <span class="badge-ready">● Disponible</span>
-      <div class="card-icon">🗝️</div>
-      <div class="card-title">Escape de fracciones</div>
-      <div class="card-desc">Resuelve fracciones para abrir puertas y escapar de una mazmorra.</div>
-      <span class="card-tag">Fracciones</span>
-    </a>
-    <div class="game-card card-soon c-mat"><span class="badge-soon">Próximamente</span><div class="card-icon">⚔️</div><div class="card-title">Duelo de ecuaciones</div><div class="card-desc">2 jugadores resuelven ecuaciones; el más rápido ataca al rival.</div><span class="card-tag">Álgebra</span></div>
-    <div class="game-card card-soon c-mat"><span class="badge-soon">Próximamente</span><div class="card-icon">📐</div><div class="card-title">Constructor de figuras</div><div class="card-desc">Arrastra ángulos y lados para construir figuras con medidas exactas.</div><span class="card-tag">Geometría</span></div>
+  <div class="section-group" data-materia="mat">
+    <div class="section-head"><h2>🔢 Matemáticas y aritmética</h2><div class="section-line"></div><span class="section-tag tag-mat">3 juegos</span></div>
+    <div class="game-grid">
+      <a class="game-card c-mat" href="escape-fracciones.html" data-game="escape-fracciones" data-materia="mat" data-grados="3,4,5,6" data-ready="1">
+        <span class="badge-ready">● Disponible</span>
+        <div class="card-icon">🗝️</div>
+        <div class="card-title">Escape de fracciones</div>
+        <div class="card-desc">Resuelve fracciones para abrir puertas y escapar de una mazmorra.</div>
+        <span class="card-tag">Fracciones · 3°-6°</span>
+      </a>
+      <div class="game-card card-soon c-mat" data-game="duelo-ecuaciones" data-materia="mat" data-grados="5,6" data-ready="0"><span class="badge-soon">Próximamente</span><div class="card-icon">⚔️</div><div class="card-title">Duelo de ecuaciones</div><div class="card-desc">2 jugadores resuelven ecuaciones; el más rápido ataca al rival.</div><span class="card-tag">Álgebra · 5°-6°</span></div>
+      <div class="game-card card-soon c-mat" data-game="constructor-figuras" data-materia="mat" data-grados="2,3,4,5,6" data-ready="0"><span class="badge-soon">Próximamente</span><div class="card-icon">📐</div><div class="card-title">Constructor de figuras</div><div class="card-desc">Arrastra ángulos y lados para construir figuras con medidas exactas.</div><span class="card-tag">Geometría · 2°-6°</span></div>
+    </div>
   </div>
 
-  <div class="section-head"><h2>🔬 Biología y ciencias naturales</h2><div class="section-line"></div><span class="section-tag tag-bio">3 juegos</span></div>
-  <div class="game-grid">
-    <div class="game-card card-soon c-bio"><span class="badge-soon">Próximamente</span><div class="card-icon">🦠</div><div class="card-title">Arma la célula</div><div class="card-desc">Arrastra organelos al lugar correcto dentro de la célula.</div><span class="card-tag">Célula</span></div>
-    <div class="game-card card-soon c-bio"><span class="badge-soon">Próximamente</span><div class="card-icon">🦁</div><div class="card-title">Cadena alimentaria</div><div class="card-desc">Construye la pirámide trófica correcta antes de que se acabe el tiempo.</div><span class="card-tag">Ecosistemas</span></div>
-    <div class="game-card card-soon c-bio"><span class="badge-soon">Próximamente</span><div class="card-icon">🦋</div><div class="card-title">Ciclo de vida</div><div class="card-desc">Ordena las etapas del ciclo de vida de distintas especies.</div><span class="card-tag">Reproducción</span></div>
+  <div class="section-group" data-materia="bio">
+    <div class="section-head"><h2>🔬 Biología y ciencias naturales</h2><div class="section-line"></div><span class="section-tag tag-bio">3 juegos</span></div>
+    <div class="game-grid">
+      <div class="game-card card-soon c-bio" data-game="arma-celula" data-materia="bio" data-grados="5,6" data-ready="0"><span class="badge-soon">Próximamente</span><div class="card-icon">🦠</div><div class="card-title">Arma la célula</div><div class="card-desc">Arrastra organelos al lugar correcto dentro de la célula.</div><span class="card-tag">Célula · 5°-6°</span></div>
+      <div class="game-card card-soon c-bio" data-game="cadena-alimentaria" data-materia="bio" data-grados="3,4,5,6" data-ready="0"><span class="badge-soon">Próximamente</span><div class="card-icon">🦁</div><div class="card-title">Cadena alimentaria</div><div class="card-desc">Construye la pirámide trófica correcta antes de que se acabe el tiempo.</div><span class="card-tag">Ecosistemas · 3°-6°</span></div>
+      <div class="game-card card-soon c-bio" data-game="ciclo-vida" data-materia="bio" data-grados="1,2,3,4" data-ready="0"><span class="badge-soon">Próximamente</span><div class="card-icon">🦋</div><div class="card-title">Ciclo de vida</div><div class="card-desc">Ordena las etapas del ciclo de vida de distintas especies.</div><span class="card-tag">Reproducción · 1°-4°</span></div>
+    </div>
   </div>
 
-  <div class="section-head"><h2>⚗️ Química</h2><div class="section-line"></div><span class="section-tag tag-qui">3 juegos</span></div>
-  <div class="game-grid">
-    <div class="game-card card-soon c-qui"><span class="badge-soon">Próximamente</span><div class="card-icon">⚗️</div><div class="card-title">Adivina el elemento</div><div class="card-desc">Pistas sobre propiedades del elemento; tienes 3 intentos para nombrarlo.</div><span class="card-tag">Tabla periódica</span></div>
-    <div class="game-card card-soon c-qui"><span class="badge-soon">Próximamente</span><div class="card-icon">⚖️</div><div class="card-title">Balancea reacciones</div><div class="card-desc">Ajusta coeficientes hasta que ambos lados de la ecuación queden iguales.</div><span class="card-tag">Reacciones</span></div>
-    <div class="game-card card-soon c-qui"><span class="badge-soon">Próximamente</span><div class="card-icon">🧪</div><div class="card-title">Forma moléculas</div><div class="card-desc">Une átomos con el número correcto de enlaces para completar moléculas.</div><span class="card-tag">Enlaces</span></div>
+  <div class="section-group" data-materia="qui">
+    <div class="section-head"><h2>⚗️ Química</h2><div class="section-line"></div><span class="section-tag tag-qui">1 juego</span></div>
+    <div class="game-grid">
+      <div class="game-card card-soon c-qui" data-game="adivina-elemento" data-materia="qui" data-grados="6" data-ready="0"><span class="badge-soon">Próximamente</span><div class="card-icon">⚗️</div><div class="card-title">Adivina el elemento</div><div class="card-desc">Pistas sobre propiedades del elemento; tienes 3 intentos para nombrarlo.</div><span class="card-tag">Tabla periódica · 6°</span></div>
+    </div>
   </div>
 
-  <div class="section-head"><h2>⚡ Física</h2><div class="section-line"></div><span class="section-tag tag-fis">3 juegos</span></div>
-  <div class="game-grid">
-    <div class="game-card card-soon c-fis"><span class="badge-soon">Próximamente</span><div class="card-icon">🚀</div><div class="card-title">Lab de fuerzas</div><div class="card-desc">Aplica fuerza y masa; predice si el objeto se mueve, cae o queda estático.</div><span class="card-tag">Mecánica</span></div>
-    <div class="game-card card-soon c-fis"><span class="badge-soon">Próximamente</span><div class="card-icon">💡</div><div class="card-title">Circuito eléctrico</div><div class="card-desc">Conecta resistencias y baterías para encender el foco exacto.</div><span class="card-tag">Electricidad</span></div>
-    <div class="game-card card-soon c-fis"><span class="badge-soon">Próximamente</span><div class="card-icon">🔊</div><div class="card-title">Simulador de ondas</div><div class="card-desc">Ajusta frecuencia y amplitud; predice lo que escuchas.</div><span class="card-tag">Ondas</span></div>
+  <div class="section-group" data-materia="fis">
+    <div class="section-head"><h2>⚡ Física</h2><div class="section-line"></div><span class="section-tag tag-fis">3 juegos</span></div>
+    <div class="game-grid">
+      <div class="game-card card-soon c-fis" data-game="lab-fuerzas" data-materia="fis" data-grados="4,5,6" data-ready="0"><span class="badge-soon">Próximamente</span><div class="card-icon">🚀</div><div class="card-title">Lab de fuerzas</div><div class="card-desc">Aplica fuerza y masa; predice si el objeto se mueve, cae o queda estático.</div><span class="card-tag">Mecánica · 4°-6°</span></div>
+      <div class="game-card card-soon c-fis" data-game="circuito-electrico" data-materia="fis" data-grados="4,5,6" data-ready="0"><span class="badge-soon">Próximamente</span><div class="card-icon">💡</div><div class="card-title">Circuito eléctrico</div><div class="card-desc">Conecta resistencias y baterías para encender el foco exacto.</div><span class="card-tag">Electricidad · 4°-6°</span></div>
+      <div class="game-card card-soon c-fis" data-game="simulador-ondas" data-materia="fis" data-grados="6" data-ready="0"><span class="badge-soon">Próximamente</span><div class="card-icon">🔊</div><div class="card-title">Simulador de ondas</div><div class="card-desc">Ajusta frecuencia y amplitud; predice lo que escuchas.</div><span class="card-tag">Ondas · 6°</span></div>
+    </div>
   </div>
 
-  <div class="section-head"><h2>🌎 Historia y Geografía</h2><div class="section-line"></div><span class="section-tag tag-his">2 juegos</span></div>
-  <div class="game-grid">
-    <div class="game-card card-soon c-his"><span class="badge-soon">Próximamente</span><div class="card-icon">📜</div><div class="card-title">Línea del tiempo</div><div class="card-desc">Arrastra eventos históricos al año correcto en la línea del tiempo.</div><span class="card-tag">Historia</span></div>
-    <div class="game-card card-soon c-geo"><span class="badge-soon">Próximamente</span><div class="card-icon">🗺️</div><div class="card-title">¿Dónde está el país?</div><div class="card-desc">Haz clic en el mapa donde crees que está el país o ciudad.</div><span class="card-tag">Geografía</span></div>
+  <div class="section-group" data-materia="his">
+    <div class="section-head"><h2>🌎 Historia y Geografía</h2><div class="section-line"></div><span class="section-tag tag-his">2 juegos</span></div>
+    <div class="game-grid">
+      <div class="game-card card-soon c-his" data-game="linea-tiempo" data-materia="his" data-grados="3,4,5,6" data-ready="0"><span class="badge-soon">Próximamente</span><div class="card-icon">📜</div><div class="card-title">Línea del tiempo</div><div class="card-desc">Arrastra eventos históricos al año correcto en la línea del tiempo.</div><span class="card-tag">Historia · 3°-6°</span></div>
+      <div class="game-card card-soon c-geo" data-game="donde-pais" data-materia="his" data-grados="4,5,6" data-ready="0"><span class="badge-soon">Próximamente</span><div class="card-icon">🗺️</div><div class="card-title">¿Dónde está el país?</div><div class="card-desc">Haz clic en el mapa donde crees que está el país o ciudad.</div><span class="card-tag">Geografía · 4°-6°</span></div>
+    </div>
   </div>
+
+</div>
+
+<!-- TAB: SECUNDARIA -->
+<div class="tab-content" data-tab-content="secundaria">
+
+  <div class="section-group" data-materia="qui">
+    <div class="section-head"><h2>⚗️ Química avanzada</h2><div class="section-line"></div><span class="section-tag tag-qui">2 juegos</span></div>
+    <div class="game-grid">
+      <div class="game-card card-soon c-qui" data-game="balancea-reacciones" data-materia="qui" data-grados="" data-ready="0"><span class="badge-soon">Próximamente</span><div class="card-icon">⚖️</div><div class="card-title">Balancea reacciones</div><div class="card-desc">Ajusta coeficientes hasta que ambos lados de la ecuación queden iguales.</div><span class="card-tag">Reacciones · Secundaria</span></div>
+      <div class="game-card card-soon c-qui" data-game="forma-moleculas" data-materia="qui" data-grados="" data-ready="0"><span class="badge-soon">Próximamente</span><div class="card-icon">🧪</div><div class="card-title">Forma moléculas</div><div class="card-desc">Une átomos con el número correcto de enlaces para completar moléculas.</div><span class="card-tag">Enlaces · Secundaria</span></div>
+    </div>
+  </div>
+
+  <div class="empty-coming-soon">
+    <div class="icon-big">🔬</div>
+    <h3>¡Próximamente más retos!</h3>
+    <p>Los juegos de secundaria están en desarrollo. Mientras tanto, explora los 13 juegos de primaria y domínalos todos. 💪</p>
+  </div>
+
+</div>
+
 </main>
 
 <footer>
@@ -275,7 +509,7 @@ footer span{color:var(--purple);}
   </div>
   <div class="footer-brand">
     <span class="footer-brand-name">EduGamePlay</span>
-    <span class="footer-version">v 0.2</span>
+    <span class="footer-version">v 0.3</span>
   </div>
   <div class="footer-dev">
     Desarrollado por <strong>Juan Pariona</strong>
@@ -320,6 +554,102 @@ try {
   console.error('Auth error:', err);
   // requireAuth() ya redirige a login si no hay sesión
 }
+</script>
+
+<!-- ═══ LÓGICA DE TABS / FILTROS / BANNER (agregado v0.3) ═══ -->
+<script>
+(function(){
+  // ── BANNER DE BIENVENIDA ──
+  const banner = document.getElementById('welcomeBanner');
+  const closeBannerBtn = document.getElementById('closeBannerBtn');
+  // Si ya se cerró en esta sesión, ocultar
+  if(sessionStorage.getItem('welcomeBannerClosed') === '1'){
+    banner.classList.add('hidden');
+  }
+  closeBannerBtn.addEventListener('click', ()=>{
+    banner.classList.add('hidden');
+    sessionStorage.setItem('welcomeBannerClosed','1');
+  });
+
+  // ── TABS ──
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+  let activeTab = 'primaria';
+
+  function setActiveTab(tab){
+    activeTab = tab;
+    tabBtns.forEach(b=>b.classList.toggle('active', b.dataset.tab === tab));
+    tabContents.forEach(c=>c.classList.toggle('active', c.dataset.tabContent === tab));
+    applyFilters(); // re-filtrar al cambiar de tab
+  }
+
+  tabBtns.forEach(btn=>{
+    btn.addEventListener('click', ()=>setActiveTab(btn.dataset.tab));
+  });
+
+  // ── FILTROS ──
+  const fGrado = document.getElementById('filterGrado');
+  const fMateria = document.getElementById('filterMateria');
+  const fReady = document.getElementById('filterReady');
+  const fResult = document.getElementById('filterResult');
+
+  function applyFilters(){
+    const grado = fGrado.value;     // 'all' | '1'..'6'
+    const materia = fMateria.value; // 'all' | 'mat'|'bio'|'qui'|'fis'|'his'
+    const onlyReady = fReady.checked;
+
+    // Solo buscar juegos dentro del tab activo
+    const activeContent = document.querySelector(`.tab-content[data-tab-content="${activeTab}"]`);
+    if(!activeContent) return;
+
+    const cards = activeContent.querySelectorAll('[data-game]');
+    let visibleCount = 0;
+
+    cards.forEach(card=>{
+      const cardMateria = card.dataset.materia;
+      const cardGrados = (card.dataset.grados||'').split(',').filter(Boolean);
+      const cardReady = card.dataset.ready === '1';
+
+      let show = true;
+      if(materia !== 'all' && cardMateria !== materia) show = false;
+      if(grado !== 'all' && !cardGrados.includes(grado)) show = false;
+      if(onlyReady && !cardReady) show = false;
+
+      card.classList.toggle('filtered-out', !show);
+      if(show) visibleCount++;
+    });
+
+    // Ocultar secciones que quedaron sin juegos visibles
+    const sections = activeContent.querySelectorAll('.section-group');
+    sections.forEach(sec=>{
+      const visibleInSection = sec.querySelectorAll('[data-game]:not(.filtered-out)').length;
+      sec.classList.toggle('filtered-out', visibleInSection === 0);
+    });
+
+    // Actualizar texto de resultados
+    updateResultText(visibleCount, grado, materia, onlyReady);
+  }
+
+  function updateResultText(n, grado, materia, onlyReady){
+    const hasFilter = grado !== 'all' || materia !== 'all' || onlyReady;
+    if(!hasFilter){ fResult.textContent = ''; fResult.classList.remove('no-results'); return; }
+
+    if(n === 0){
+      fResult.innerHTML = '⚠️ Ningún juego coincide con esos filtros.';
+      fResult.classList.add('no-results');
+    } else {
+      fResult.innerHTML = `Mostrando <strong>${n}</strong> ${n===1?'juego':'juegos'}`;
+      fResult.classList.remove('no-results');
+    }
+  }
+
+  fGrado.addEventListener('change', applyFilters);
+  fMateria.addEventListener('change', applyFilters);
+  fReady.addEventListener('change', applyFilters);
+
+  // Aplicar filtros vacíos al inicio (solo para actualizar vista si alguien recarga)
+  applyFilters();
+})();
 </script>
 
 </body>
