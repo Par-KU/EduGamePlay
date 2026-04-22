@@ -358,9 +358,88 @@ body::before{
 .footer-game-dev{font-size:11px;color:#666;}
 .footer-game-dev strong{color:#aaa;font-weight:600;}
 .footer-game-copy{font-size:10px;color:#555;margin-top:2px;letter-spacing:.5px;}
+
+/* ═══ MINI-HEADER DE AUTH (agregado v0.2) ═══ */
+#auth-loading{
+  position:fixed;inset:0;background:var(--stone);z-index:999;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  font-family:'Crimson Pro',serif;color:var(--muted);font-size:13px;
+}
+#auth-loading .spinner{
+  width:36px;height:36px;border:3px solid rgba(212,160,23,.2);
+  border-top-color:var(--gold);border-radius:50%;
+  animation:authSpin .8s linear infinite;
+}
+@keyframes authSpin{to{transform:rotate(360deg);}}
+
+#user-header{
+  display:none;align-items:center;gap:10px;
+  background:#0a0a18;border-bottom:1px solid rgba(255,255,255,.08);
+  padding:8px 16px;min-height:40px;
+  position:fixed;top:0;left:0;right:0;z-index:20;
+  flex-wrap:wrap;
+  font-family:'Nunito',sans-serif;
+}
+#user-greet{
+  display:flex;align-items:center;gap:6px;flex:1;min-width:0;
+  font-size:13px;color:#f1f0e8;
+}
+#user-greet .u-wave{font-size:15px;}
+#user-greet .u-name{font-weight:700;color:#facc15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#user-greet .u-role{
+  font-size:11px;color:#8a8aa5;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:20px;padding:2px 8px;
+  white-space:nowrap;
+}
+.hdr-btn{
+  font-size:12px;font-weight:700;font-family:'Nunito',sans-serif;
+  padding:6px 12px;border-radius:8px;
+  background:rgba(167,139,250,.12);color:#a78bfa;
+  border:1px solid rgba(167,139,250,.25);
+  text-decoration:none;cursor:pointer;
+  display:inline-flex;align-items:center;gap:4px;
+  -webkit-tap-highlight-color:transparent;
+  transition:background .15s;
+}
+.hdr-btn:hover,.hdr-btn:active{background:rgba(167,139,250,.2);}
+.hdr-btn.logout{
+  background:rgba(248,113,113,.1);color:#f472b6;
+  border-color:rgba(248,113,113,.25);
+}
+.hdr-btn.logout:hover,.hdr-btn.logout:active{background:rgba(248,113,113,.18);}
+
+/* Empujar el contenido hacia abajo para no tapar con el header fijo */
+body.auth-loaded{padding-top:52px;}
+
+@media(max-width:480px){
+  #user-greet .u-role{display:none;}
+  #user-greet{font-size:12px;}
+  .hdr-btn{padding:5px 10px;font-size:11px;}
+}
 </style>
 </head>
 <body>
+
+<!-- Loading de verificación de sesión -->
+<div id="auth-loading">
+  <div class="spinner"></div>
+  <div>Verificando sesión...</div>
+</div>
+
+<!-- Mini-header con usuario autenticado -->
+<div id="user-header">
+  <div id="user-greet">
+    <span class="u-wave">👋</span>
+    <span>Hola,&nbsp;</span>
+    <span class="u-name" id="userName">—</span>
+    <span class="u-role" id="userRole"></span>
+  </div>
+  <a class="hdr-btn" href="dashboard.html">🎮 Juegos</a>
+  <a class="hdr-btn" href="admin.html" id="adminBtn" style="display:none;">📊 Admin</a>
+  <button class="hdr-btn logout" id="logoutBtn">↪ Salir</button>
+</div>
 
 <div id="app">
 
@@ -387,7 +466,7 @@ body::before{
   </div>
 
   <button class="start-btn" id="start-btn">⚔️ Entrar a la mazmorra</button>
-  <a class="back-link" href="index.html">← Volver al inicio</a>
+  <a class="back-link" href="dashboard.html">← Volver al catálogo</a>
 </div>
 
 <!-- GAME -->
@@ -854,10 +933,42 @@ function backToSetup(){
   <div>Hecho con ❤️ para el salón de clases · HTML puro · Sin instalación · Gratis</div>
   <div class="footer-game-brand">
     <span class="footer-game-name">EduGamePlay</span>
-    <span class="footer-game-ver">v 0.1</span>
+    <span class="footer-game-ver">v 0.2</span>
   </div>
   <div class="footer-game-dev">Desarrollado por <strong>Juan Pariona</strong></div>
   <div class="footer-game-copy">© 2026 Juan Pariona · Todos los derechos reservados</div>
 </div>
+
+<!-- ═══ SCRIPT DE AUTH (agregado v0.2) ═══ -->
+<script type="module">
+import { requireAuth, logout, getDisplayName, getRoleLabel } from './js/auth.js';
+
+try {
+  const user = await requireAuth();
+
+  document.getElementById('userName').textContent = getDisplayName(user);
+  document.getElementById('userRole').textContent = getRoleLabel(user.rol);
+
+  // Pre-llenar el campo de nombre del juego con el nombre del usuario autenticado
+  const pn = document.getElementById('player-name');
+  if(pn && !pn.value){ pn.value = getDisplayName(user); }
+
+  if(user.rol === 'admin') {
+    document.getElementById('adminBtn').style.display = 'inline-flex';
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', async ()=>{
+    if(confirm('¿Cerrar sesión?')) await logout('index.html');
+  });
+
+  // Mostrar header, ocultar loading
+  document.getElementById('auth-loading').style.display = 'none';
+  document.getElementById('user-header').style.display = 'flex';
+  document.body.classList.add('auth-loaded');
+
+} catch(err) {
+  console.error('Auth error:', err);
+}
+</script>
 </body>
 </html>
