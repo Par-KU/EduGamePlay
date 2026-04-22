@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-09YP073NX2"></script>
+<script>
+window.dataLayer=window.dataLayer||[];
+function gtag(){dataLayer.push(arguments);}
+gtag("js",new Date());
+gtag("config","G-09YP073NX2");
+</script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Configuración inicial — EduGamePlay</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0e0e1a;--bg2:#16162a;--bg3:#1e1e38;
+  --accent:#facc15;--accent2:#f97316;
+  --purple:#a78bfa;--green:#4ade80;--red:#f87171;
+  --text:#f1f0e8;--muted:#6b6b8a;
+  --border:rgba(255,255,255,0.07);
+  --radius:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);
+  display:flex;flex-direction:column;align-items:center;
+  min-height:100vh;padding:20px;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%,rgba(167,139,250,0.12) 0%,transparent 70%),
+    var(--bg);
+  overflow-x:hidden;
+}
+
+.star{position:fixed;border-radius:50%;background:#fff;pointer-events:none;animation:twinkle var(--dur,3s) ease-in-out infinite var(--delay,0s);z-index:0;}
+@keyframes twinkle{0%,100%{opacity:0}50%{opacity:.6}}
+
+.top-logo{text-decoration:none;margin-top:20px;margin-bottom:20px;position:relative;z-index:1;}
+.top-logo-text{
+  font-family:'Fredoka One',cursive;font-size:clamp(26px,6vw,34px);line-height:1;
+  background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 50%,#f472b6 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+/* Banner de modo setup */
+.setup-banner{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(250,204,21,.12);color:var(--accent);
+  font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px;
+  border:1px solid rgba(250,204,21,.3);
+  letter-spacing:1.5px;text-transform:uppercase;
+  margin-bottom:10px;z-index:1;position:relative;
+}
+.setup-banner::before{content:'⚙️';font-size:13px;}
+
+/* Card */
+.setup-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:clamp(24px,5vw,36px);
+  width:100%;max-width:460px;position:relative;z-index:1;
+  box-shadow:0 20px 60px rgba(0,0,0,.4);
+}
+.card-icon{font-size:clamp(40px,10vw,56px);text-align:center;margin-bottom:8px;}
+.card-title{
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(22px,6vw,28px);text-align:center;color:var(--text);
+  margin-bottom:6px;line-height:1.2;
+}
+.card-sub{
+  text-align:center;color:var(--muted);
+  font-size:clamp(12px,3vw,14px);margin-bottom:24px;line-height:1.5;
+}
+
+/* Form */
+.form-group{margin-bottom:14px;}
+.form-label{
+  display:block;font-size:11px;font-weight:800;color:var(--purple);
+  letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;
+}
+.form-hint{font-size:11px;color:var(--muted);margin-top:4px;font-style:italic;}
+.form-input{
+  width:100%;padding:12px 14px;
+  font-family:'Nunito',sans-serif;font-size:15px;
+  background:rgba(0,0,0,.3);color:var(--text);
+  border:1.5px solid var(--border);border-radius:10px;
+  outline:none;min-height:48px;
+  transition:border-color .15s;
+}
+.form-input:focus{border-color:var(--purple);background:rgba(0,0,0,.5);}
+.form-input::placeholder{color:var(--muted);}
+
+.password-wrap{position:relative;}
+.password-toggle{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  background:transparent;border:none;cursor:pointer;
+  font-size:18px;color:var(--muted);padding:6px;
+  -webkit-tap-highlight-color:transparent;
+}
+
+/* Alert */
+.alert{
+  padding:12px 14px;border-radius:10px;
+  font-size:13px;line-height:1.5;margin-bottom:14px;
+  display:none;
+}
+.alert.show{display:block;}
+.alert.error{background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);color:var(--red);}
+.alert.success{background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.3);color:var(--green);}
+.alert.warning{background:rgba(250,204,21,.12);border:1px solid rgba(250,204,21,.3);color:var(--accent);}
+.alert.info{background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.3);color:var(--purple);}
+
+/* Submit */
+.submit-btn{
+  width:100%;background:var(--accent);color:#1a1a00;
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(15px,4vw,17px);padding:14px;border:none;border-radius:12px;
+  cursor:pointer;border-bottom:4px solid #b8960f;
+  min-height:52px;margin-top:8px;letter-spacing:.5px;
+  transition:transform .15s,border-bottom-width .15s,opacity .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.submit-btn:active:not(:disabled){transform:translateY(2px);border-bottom-width:1px;}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed;}
+.submit-btn .spinner{
+  display:inline-block;width:14px;height:14px;
+  border:2px solid rgba(26,26,0,.3);border-top-color:#1a1a00;
+  border-radius:50%;animation:spin .6s linear infinite;
+  vertical-align:middle;margin-right:6px;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Loading inicial */
+#initial-loading{
+  text-align:center;padding:40px 20px;color:var(--muted);
+}
+#initial-loading .spinner{
+  width:40px;height:40px;border:3px solid rgba(167,139,250,.2);
+  border-top-color:var(--purple);border-radius:50%;
+  animation:spin .8s linear infinite;margin:0 auto 12px;
+}
+
+/* Back link */
+.back-link{
+  margin-top:24px;color:var(--muted);font-size:13px;
+  text-decoration:none;padding:10px;
+  position:relative;z-index:1;
+  transition:color .15s;
+}
+.back-link:active,.back-link:hover{color:var(--purple);}
+
+/* Footer */
+.footer-mini{
+  margin-top:auto;padding:20px 16px 10px;
+  text-align:center;color:var(--muted);
+  font-size:11px;line-height:1.6;position:relative;z-index:1;
+}
+.footer-mini-brand{
+  font-family:'Fredoka One',cursive;font-size:13px;
+  background:linear-gradient(135deg,var(--accent),#f472b6);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+/* Divider */
+.divider{
+  display:flex;align-items:center;gap:10px;margin:14px 0;
+  color:var(--muted);font-size:11px;letter-spacing:1px;
+}
+.divider::before,.divider::after{
+  content:'';flex:1;height:1px;background:var(--border);
+}
+
+/* Bloqueo view */
+.blocked-box{
+  background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);
+  border-radius:12px;padding:20px;text-align:center;margin-bottom:14px;
+}
+.blocked-box .icon{font-size:44px;margin-bottom:8px;}
+.blocked-box .title{color:var(--red);font-weight:700;font-size:16px;margin-bottom:6px;}
+.blocked-box .sub{color:var(--muted);font-size:13px;line-height:1.6;}
+</style>
+</head>
+<body>
+
+<a class="top-logo" href="index.html">
+  <span class="top-logo-text">EduGamePlay</span>
+</a>
+<div class="setup-banner">Configuración inicial</div>
+
+<!-- Loading inicial -->
+<div id="initial-loading" class="setup-card">
+  <div class="spinner"></div>
+  <div>Verificando estado del sistema...</div>
+</div>
+
+<!-- Vista: Ya existe un admin (bloqueo) -->
+<div class="setup-card" id="view-blocked" style="display:none;">
+  <div class="blocked-box">
+    <div class="icon">🔒</div>
+    <div class="title">Sistema ya configurado</div>
+    <div class="sub">
+      Este asistente solo puede ejecutarse una vez.<br>
+      Ya existe al menos un administrador en la plataforma.<br><br>
+      Para crear más usuarios, inicia sesión y usa el panel de administración.
+    </div>
+  </div>
+  <a href="login.html" class="submit-btn" style="display:block;text-align:center;text-decoration:none;">
+    🔐 Ir al login
+  </a>
+</div>
+
+<!-- Vista: Crear primer admin -->
+<div class="setup-card" id="view-setup" style="display:none;">
+  <div class="card-icon">👑</div>
+  <div class="card-title">Crea tu administrador</div>
+  <div class="card-sub">Este es el primer y único paso de configuración. Después de crear el admin, este asistente se bloqueará automáticamente.</div>
+
+  <div class="alert info show">
+    ℹ️ Esta cuenta tendrá control total sobre usuarios y datos. Guarda bien las credenciales.
+  </div>
+
+  <div class="alert" id="formAlert"></div>
+
+  <form id="setupForm" autocomplete="off">
+    <div class="form-group">
+      <label class="form-label" for="nombre">Tu nombre completo</label>
+      <input class="form-input" type="text" id="nombre" placeholder="Juan Carlos Pariona" required/>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="email">Correo electrónico</label>
+      <input class="form-input" type="email" id="email" placeholder="admin@edugameplay.com" required autocomplete="off"/>
+      <div class="form-hint">Este será tu usuario para iniciar sesión</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="password">Contraseña</label>
+      <div class="password-wrap">
+        <input class="form-input" type="password" id="password" placeholder="Mínimo 6 caracteres" required minlength="6" autocomplete="new-password" style="padding-right:44px;"/>
+        <button type="button" class="password-toggle" id="pwToggle" tabindex="-1">👁️</button>
+      </div>
+      <div class="form-hint">Mínimo 6 caracteres</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="password2">Confirmar contraseña</label>
+      <input class="form-input" type="password" id="password2" placeholder="Repite la contraseña" required autocomplete="new-password"/>
+    </div>
+
+    <button type="submit" class="submit-btn" id="submitBtn">
+      👑 Crear administrador
+    </button>
+  </form>
+</div>
+
+<!-- Vista: Éxito -->
+<div class="setup-card" id="view-success" style="display:none;">
+  <div style="text-align:center;">
+    <div class="card-icon">✅</div>
+    <div class="card-title" style="color:var(--green);">¡Administrador creado!</div>
+    <div class="card-sub">Tu cuenta se creó correctamente y ya estás logueado como admin.</div>
+  </div>
+
+  <div class="alert success show">
+    🎉 Redirigiendo al panel de administración en <span id="countdown">3</span> segundos...
+  </div>
+
+  <a href="admin.html" class="submit-btn" style="display:block;text-align:center;text-decoration:none;">
+    🚀 Ir al panel ahora
+  </a>
+</div>
+
+<a class="back-link" href="index.html">← Volver al inicio</a>
+
+<div class="footer-mini">
+  <div><span class="footer-mini-brand">EduGamePlay</span> v 0.2</div>
+  <div>© 2026 Juan Pariona</div>
+</div>
+
+<script type="module">
+import { auth, db } from './js/firebase-config.js';
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  collection, query, where, getDocs, doc, setDoc, serverTimestamp, limit
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const initialLoading = document.getElementById('initial-loading');
+const viewBlocked = document.getElementById('view-blocked');
+const viewSetup = document.getElementById('view-setup');
+const viewSuccess = document.getElementById('view-success');
+const formAlert = document.getElementById('formAlert');
+const submitBtn = document.getElementById('submitBtn');
+const form = document.getElementById('setupForm');
+
+function showAlert(msg, type='error'){
+  formAlert.textContent = msg;
+  formAlert.className = `alert show ${type}`;
+}
+function hideAlert(){ formAlert.className = 'alert'; }
+
+function translateError(code){
+  const errors = {
+    'auth/email-already-in-use': 'Ya existe una cuenta con ese correo. Usa otro o inicia sesión.',
+    'auth/invalid-email': 'El correo no tiene un formato válido.',
+    'auth/weak-password': 'La contraseña es muy débil. Usa al menos 6 caracteres.',
+    'auth/network-request-failed': 'Sin conexión a internet.',
+    'permission-denied': 'Sin permisos. Verifica las reglas de Firestore.',
+  };
+  return errors[code] || `Error: ${code || 'desconocido'}`;
+}
+
+// ── VERIFICAR SI YA HAY ADMIN ──
+async function checkSystemState(){
+  try{
+    const usersRef = collection(db, 'users');
+    const q = query(usersRef, where('rol', '==', 'admin'), limit(1));
+    const snapshot = await getDocs(q);
+
+    initialLoading.style.display = 'none';
+
+    if(!snapshot.empty){
+      // Ya existe al menos un admin → bloquear
+      viewBlocked.style.display = 'block';
+    } else {
+      // No hay admin → mostrar setup
+      viewSetup.style.display = 'block';
+    }
+  } catch(err){
+    console.error('Error verificando sistema:', err);
+    initialLoading.style.display = 'none';
+    viewSetup.style.display = 'block';
+    showAlert('⚠️ No se pudo verificar el estado del sistema. Puedes intentar crear el admin de todas formas. Si falla, revisa las reglas de Firestore.', 'warning');
+  }
+}
+
+// ── TOGGLE PASSWORD ──
+const pwInput = document.getElementById('password');
+const pwToggle = document.getElementById('pwToggle');
+pwToggle.addEventListener('click', ()=>{
+  if(pwInput.type === 'password'){
+    pwInput.type = 'text'; pwToggle.textContent = '🙈';
+  } else {
+    pwInput.type = 'password'; pwToggle.textContent = '👁️';
+  }
+});
+
+// ── CREAR ADMIN ──
+form.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  hideAlert();
+
+  const nombre = document.getElementById('nombre').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const password2 = document.getElementById('password2').value;
+
+  if(!nombre || !email || !password){
+    showAlert('Completa todos los campos.');
+    return;
+  }
+  if(password.length < 6){
+    showAlert('La contraseña debe tener al menos 6 caracteres.');
+    return;
+  }
+  if(password !== password2){
+    showAlert('Las contraseñas no coinciden.');
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="spinner"></span>Creando administrador...';
+
+  try{
+    // 1. Crear usuario en Firebase Authentication
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    const user = cred.user;
+
+    // 2. Crear documento en Firestore con primerLogin: false (admin salta perfil)
+    await setDoc(doc(db, 'users', user.uid), {
+      email: email,
+      nombre: nombre,
+      rol: 'admin',
+      activo: true,
+      primerLogin: false,
+      creadoEn: serverTimestamp(),
+      creadoPor: 'setup-wizard',
+      stats: {
+        ultimoAcceso: serverTimestamp(),
+        totalPartidas: 0,
+        tiempoTotalSegundos: 0,
+        juegosJugados: {}
+      }
+    });
+
+    // 3. Éxito → mostrar vista de éxito
+    viewSetup.style.display = 'none';
+    viewSuccess.style.display = 'block';
+
+    // Countdown y redirect
+    let count = 3;
+    const countEl = document.getElementById('countdown');
+    const interval = setInterval(()=>{
+      count--;
+      if(countEl) countEl.textContent = count;
+      if(count <= 0){
+        clearInterval(interval);
+        window.location.href = 'admin.html';
+      }
+    }, 1000);
+
+  } catch(err){
+    console.error('Error creando admin:', err);
+    showAlert(translateError(err.code || err.message));
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '👑 Crear administrador';
+  }
+});
+
+// Iniciar verificación
+checkSystemState();
+</script>
+
+<script>
+// Estrellas
+const starCount = window.innerWidth < 480 ? 15 : 35;
+for(let i=0;i<starCount;i++){
+  const s=document.createElement('div');s.className='star';
+  const sz=1+Math.random()*1.5;
+  s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${sz}px;height:${sz}px;--dur:${2+Math.random()*4}s;--delay:${Math.random()*5}s;`;
+  document.body.appendChild(s);
+}
+</script>
+
+</body>
+</html>
