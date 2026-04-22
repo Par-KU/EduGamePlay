@@ -777,10 +777,15 @@ function genEquation6(){
 }
 
 function formatEquation(eqStr){
-  // Renderizar en HTML con colores
-  return eqStr
-    .replace(/\b(x)\b/g, '<span class="x-var">x</span>')
-    .replace(/=/g, '<span class="equals">=</span>');
+  return eqStr.split(' ').map(part => {
+    if (part.includes('x')) {
+      return part.replace('x', '<span class="x-var">x</span>');
+    }
+    if (part === '=') {
+      return '<span class="equals">=</span>';
+    }
+    return part;
+  }).join(' ');
 }
 
 // ── BATTLE FLOW ──
