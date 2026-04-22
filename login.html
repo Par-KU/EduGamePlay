@@ -308,17 +308,38 @@ function translateError(code){
   return errors[code] || 'Error al iniciar sesión. Intenta de nuevo.';
 }
 
+// ── REDIRECCIÓN SEGÚN ROL (con logs debug) ──
+async function redirectUsuario(user){
+  console.log('🔍 [DEBUG] UID autenticado:', user.uid);
+  const userDoc = await getDoc(doc(db, 'users', user.uid));
+  console.log('🔍 [DEBUG] ¿Documento existe en Firestore?', userDoc.exists());
+  if(userDoc.exists()){
+    const data = userDoc.data();
+    console.log('🔍 [DEBUG] Datos del documento:', data);
+    console.log('🔍 [DEBUG] primerLogin =', data.primerLogin, 'tipo:', typeof data.primerLogin);
+    console.log('🔍 [DEBUG] rol =', data.rol, 'tipo:', typeof data.rol);
+    if(data.primerLogin === true){
+      console.log('↪️ [DEBUG] primerLogin true → completar-perfil.html');
+      window.location.href = 'completar-perfil.html';
+    } else if(data.rol === 'admin'){
+      console.log('✅ [DEBUG] Rol admin → admin.html');
+      window.location.href = 'admin.html';
+    } else {
+      console.log('✅ [DEBUG] Rol', data.rol, '→ dashboard.html');
+      window.location.href = 'dashboard.html';
+    }
+  } else {
+    console.warn('⚠️ [DEBUG] Documento NO existe → completar-perfil.html');
+    window.location.href = 'completar-perfil.html';
+  }
+}
+
 // ── SI YA ESTÁ AUTENTICADO, REDIRIGIR ──
 onAuthStateChanged(auth, async (user)=>{
   if(user){
     // Verificar si completó el perfil
     try{
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      if(userDoc.exists() && userDoc.data().primerLogin === false){
-        window.location.href = 'dashboard.html';
-      } else {
-        window.location.href = 'completar-perfil.html';
-      }
+      await redirectUsuario(user);
     } catch(err){
       console.error('Error verificando usuario:', err);
     }
@@ -365,14 +386,8 @@ form.addEventListener('submit', async (e)=>{
     showAlert(alertEl, '✓ Sesión iniciada. Redirigiendo...', 'success');
 
     // Verificar si el usuario tiene documento en Firestore y si completó perfil
-    const userDoc = await getDoc(doc(db, 'users', user.uid));
-
-    setTimeout(()=>{
-      if(userDoc.exists() && userDoc.data().primerLogin === false){
-        window.location.href = 'dashboard.html';
-      } else {
-        window.location.href = 'completar-perfil.html';
-      }
+    setTimeout(async ()=>{
+      await redirectUsuario(user);
     }, 800);
 
   } catch(err){
