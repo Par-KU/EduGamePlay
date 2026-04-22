@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-09YP073NX2"></script>
+<script>
+window.dataLayer=window.dataLayer||[];
+function gtag(){dataLayer.push(arguments);}
+gtag("js",new Date());
+gtag("config","G-09YP073NX2");
+</script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EduGamePlay — Juegos Educativos para el Salón de Clases</title>
+<meta name="description" content="Juegos educativos HTML para maestros. Multiplica Kart, Escape de Fracciones y más. Sin instalación, gratis, directo en el navegador."/>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0e0e1a;--bg2:#16162a;--bg3:#1e1e38;
+  --accent:#facc15;--accent2:#f97316;
+  --purple:#a78bfa;--green:#4ade80;--blue:#60a5fa;
+  --pink:#f472b6;--teal:#2dd4bf;
+  --text:#f1f0e8;--muted:#6b6b8a;
+  --border:rgba(255,255,255,0.07);
+  --radius:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* ── ESTRELLAS DE FONDO ── */
+.star{position:fixed;border-radius:50%;background:#fff;pointer-events:none;animation:twinkle var(--dur,3s) ease-in-out infinite var(--delay,0s);z-index:0;}
+@keyframes twinkle{0%,100%{opacity:0}50%{opacity:.6}}
+
+/* ── NAV SUPERIOR ── */
+.top-nav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(14,14,26,.85);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+  padding:12px 20px;
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+}
+.nav-logo{font-family:'Fredoka One',cursive;font-size:clamp(20px,5vw,26px);line-height:1;
+  background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 50%,var(--pink) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.nav-login-btn{
+  background:var(--purple);color:#fff;font-family:'Fredoka One',cursive;
+  font-size:clamp(13px,3.5vw,15px);padding:10px 20px;border-radius:10px;
+  text-decoration:none;border-bottom:3px solid #6d28d9;
+  transition:transform .15s,border-bottom-width .15s;
+  white-space:nowrap;
+  -webkit-tap-highlight-color:transparent;
+}
+.nav-login-btn:active{transform:translateY(2px);border-bottom-width:1px;}
+@media(hover:hover){.nav-login-btn:hover{background:#8b5cf6;}}
+
+/* ── HERO ── */
+.hero{
+  position:relative;z-index:1;
+  padding:clamp(40px,10vw,80px) 20px clamp(30px,8vw,50px);
+  text-align:center;
+  background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(167,139,250,0.15) 0%,transparent 70%);
+}
+.hero-logo{font-family:'Fredoka One',cursive;font-size:clamp(40px,11vw,80px);line-height:1;
+  background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 50%,var(--pink) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:12px;}
+.hero-tagline{font-size:clamp(14px,4vw,18px);color:var(--text);font-weight:600;margin-bottom:8px;max-width:640px;margin-left:auto;margin-right:auto;line-height:1.5;}
+.hero-tagline span{color:var(--purple);}
+.hero-sub{font-size:clamp(12px,3vw,14px);color:var(--muted);max-width:520px;margin:0 auto 28px;line-height:1.6;}
+.hero-ctas{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.cta-primary{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--accent);color:#1a1a00;
+  font-family:'Fredoka One',cursive;font-size:clamp(15px,4vw,18px);
+  padding:14px 28px;border-radius:12px;text-decoration:none;
+  border-bottom:4px solid #b8960f;min-height:50px;
+  transition:transform .15s,border-bottom-width .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.cta-primary:active{transform:translateY(2px);border-bottom-width:1px;}
+.cta-secondary{
+  display:inline-flex;align-items:center;gap:8px;
+  background:transparent;color:var(--text);
+  font-family:'Fredoka One',cursive;font-size:clamp(15px,4vw,18px);
+  padding:14px 28px;border-radius:12px;text-decoration:none;
+  border:2px solid var(--border);border-bottom:4px solid var(--border);
+  min-height:50px;
+  transition:border-color .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.cta-secondary:active{transform:translateY(2px);}
+@media(hover:hover){.cta-secondary:hover{border-color:var(--purple);}}
+
+/* ── STATS ── */
+.stats-bar{
+  display:flex;justify-content:center;gap:clamp(14px,5vw,40px);
+  padding:14px 20px;background:var(--bg2);
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  flex-wrap:wrap;position:relative;z-index:1;
+}
+.stat{text-align:center;}
+.stat-num{font-family:'Fredoka One',cursive;font-size:clamp(20px,6vw,28px);color:var(--accent);}
+.stat-lbl{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+
+/* ── DEMO SECTION ── */
+.demo-section{
+  max-width:900px;margin:0 auto;padding:clamp(32px,8vw,60px) 16px;
+  position:relative;z-index:1;
+}
+.demo-head{text-align:center;margin-bottom:24px;}
+.demo-eyebrow{
+  display:inline-block;background:rgba(74,222,128,.15);color:var(--green);
+  font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px;
+  letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;
+  border:1px solid rgba(74,222,128,.3);
+}
+.demo-eyebrow::before{content:'●';font-size:8px;animation:pulse 1.5s ease-in-out infinite;margin-right:6px;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.demo-title{font-family:'Fredoka One',cursive;font-size:clamp(24px,6vw,36px);color:var(--text);margin-bottom:8px;line-height:1.2;}
+.demo-title span{color:var(--accent);}
+.demo-sub{font-size:clamp(13px,3vw,15px);color:var(--muted);max-width:540px;margin:0 auto;line-height:1.6;}
+
+/* ── DEMO JUGABLE (mini-juego) ── */
+.demo-game{
+  background:var(--bg2);
+  border:2px solid var(--purple);
+  border-radius:var(--radius);
+  overflow:hidden;
+  position:relative;
+  box-shadow:0 20px 60px rgba(167,139,250,.15);
+}
+.demo-game-header{
+  background:#0d0d1a;padding:10px 16px;
+  display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid var(--border);
+}
+.demo-dot{width:12px;height:12px;border-radius:50%;}
+.demo-dot.red{background:#ef4444;}
+.demo-dot.yellow{background:var(--accent);}
+.demo-dot.green{background:var(--green);}
+.demo-game-title{flex:1;text-align:center;font-family:'Courier New',monospace;font-size:12px;color:var(--muted);letter-spacing:2px;}
+
+.demo-body{padding:clamp(14px,4vw,22px);font-family:'Courier New',monospace;}
+
+.demo-track{
+  background:#f5d87a;
+  height:clamp(100px,22vw,140px);
+  border-radius:8px;
+  position:relative;
+  overflow:hidden;
+  margin-bottom:14px;
+  background-image:
+    linear-gradient(to bottom,#f5d87a 0%,#e8c36a 100%),
+    repeating-linear-gradient(90deg,transparent 0 30px,rgba(0,0,0,.08) 30px 32px);
+  background-size:100% 100%,100% 100%;
+}
+.demo-track::before{
+  content:'';position:absolute;top:50%;left:0;right:0;height:2px;
+  background:repeating-linear-gradient(90deg,#fff 0 12px,transparent 12px 24px);
+  transform:translateY(-50%);
+}
+.demo-finish{
+  position:absolute;right:4px;top:0;bottom:0;width:24px;
+  background:
+    repeating-linear-gradient(45deg,#000 0 8px,#fff 8px 16px);
+  border-left:2px solid #fff;
+}
+.demo-token{
+  position:absolute;top:50%;
+  font-size:clamp(28px,7vw,40px);
+  transition:left .6s cubic-bezier(.5,0,.3,1);
+  filter:drop-shadow(1px 2px 0 rgba(0,0,0,.5));
+  left:4px;transform:translateY(-50%);
+  z-index:3;
+}
+
+.demo-question{
+  text-align:center;
+  color:var(--accent);
+  font-size:clamp(22px,6vw,32px);
+  font-weight:bold;
+  margin:12px 0 14px;
+  text-shadow:2px 2px 0 #7a5000;
+  min-height:40px;
+}
+
+.demo-options{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:8px;
+  margin-bottom:12px;
+}
+@media(min-width:540px){.demo-options{grid-template-columns:repeat(4,1fr);}}
+.demo-opt{
+  background:rgba(255,255,255,.05);
+  border:2px solid rgba(255,255,255,.15);
+  border-radius:10px;color:#fff;
+  font-family:'Courier New',monospace;
+  font-size:clamp(16px,4.5vw,20px);font-weight:bold;
+  padding:14px 8px;cursor:pointer;
+  min-height:52px;
+  transition:background .12s,border-color .12s,transform .1s;
+  -webkit-tap-highlight-color:transparent;
+}
+.demo-opt:active:not(:disabled){transform:scale(.97);}
+.demo-opt:disabled{cursor:default;opacity:.8;}
+.demo-opt.correct{background:rgba(74,222,128,.25);border-color:var(--green);color:var(--green);}
+.demo-opt.wrong{background:rgba(248,113,113,.25);border-color:#f87171;color:#f87171;}
+.demo-opt.reveal{background:rgba(74,222,128,.15);border-color:var(--green);color:var(--green);}
+
+.demo-feedback{
+  text-align:center;font-size:13px;font-weight:bold;
+  min-height:20px;
+  color:var(--muted);
+}
+.demo-feedback.ok{color:var(--green);}
+.demo-feedback.fail{color:#f87171;}
+.demo-feedback.win{color:var(--accent);font-size:15px;}
+
+.demo-progress{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 12px;background:rgba(0,0,0,.3);
+  border-radius:8px;margin-bottom:12px;
+  font-size:11px;color:var(--muted);
+  letter-spacing:1px;
+}
+.demo-progress-bar{flex:1;height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;}
+.demo-progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--pink));width:0;transition:width .6s;}
+
+.demo-cta-overlay{
+  position:absolute;inset:0;
+  background:rgba(14,14,26,.95);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;
+  flex-direction:column;padding:20px;text-align:center;
+  z-index:10;
+}
+.demo-cta-overlay.show{display:flex;}
+.demo-cta-icon{font-size:clamp(50px,12vw,70px);margin-bottom:12px;animation:float 2s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.demo-cta-title{font-family:'Fredoka One',cursive;font-size:clamp(22px,6vw,32px);color:var(--accent);margin-bottom:8px;line-height:1.2;}
+.demo-cta-sub{font-size:clamp(12px,3vw,14px);color:var(--muted);margin-bottom:20px;max-width:360px;line-height:1.6;}
+.demo-cta-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+.demo-retry-btn{
+  background:transparent;color:var(--muted);
+  border:1.5px solid var(--border);border-radius:8px;
+  font-family:'Courier New',monospace;font-size:13px;
+  padding:10px 20px;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.demo-retry-btn:active{background:rgba(255,255,255,.05);}
+
+/* ── FEATURES COMPACTOS ── */
+.features-strip{
+  max-width:900px;margin:0 auto;padding:20px 16px 40px;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px;
+}
+.feat{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;padding:16px;text-align:center;
+}
+.feat-ico{font-size:28px;margin-bottom:8px;}
+.feat-title{font-family:'Fredoka One',cursive;font-size:15px;color:var(--text);margin-bottom:4px;}
+.feat-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+
+/* ── CTA FINAL ── */
+.cta-section{
+  max-width:700px;margin:0 auto;padding:clamp(30px,7vw,50px) 16px;
+  text-align:center;position:relative;z-index:1;
+}
+.cta-box{
+  background:linear-gradient(135deg,rgba(167,139,250,.1),rgba(244,114,182,.1));
+  border:2px solid rgba(167,139,250,.3);
+  border-radius:var(--radius);
+  padding:clamp(24px,6vw,40px);
+}
+.cta-title{font-family:'Fredoka One',cursive;font-size:clamp(22px,6vw,32px);color:var(--text);margin-bottom:12px;line-height:1.2;}
+.cta-title span{background:linear-gradient(135deg,var(--accent),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.cta-sub{font-size:clamp(13px,3vw,15px);color:var(--muted);margin-bottom:22px;line-height:1.6;}
+
+/* ── FOOTER ── */
+footer{text-align:center;padding:28px 16px 20px;border-top:1px solid var(--border);color:var(--muted);font-size:12px;line-height:1.8;position:relative;z-index:1;}
+footer .footer-main{margin-bottom:10px;}
+footer .footer-main span{color:var(--purple);}
+.footer-brand{display:inline-flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:30px;padding:8px 20px;margin-bottom:10px;}
+.footer-brand-name{font-family:'Fredoka One',cursive;font-size:15px;background:linear-gradient(135deg,var(--accent),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.5px;}
+.footer-version{font-size:10px;background:rgba(167,139,250,.15);color:var(--purple);border:1px solid rgba(167,139,250,.3);border-radius:10px;padding:2px 8px;font-weight:700;letter-spacing:1px;}
+.footer-dev{font-size:11px;color:var(--muted);}
+.footer-dev strong{color:var(--text);font-weight:600;}
+.footer-copy{font-size:10px;color:var(--muted);opacity:.6;margin-top:4px;letter-spacing:.5px;}
+</style>
+</head>
+<body>
+
+<!-- NAV SUPERIOR -->
+<nav class="top-nav">
+  <div class="nav-logo">EduGamePlay</div>
+  <a class="nav-login-btn" href="login.html">🔐 Iniciar sesión</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-logo">EduGamePlay</div>
+  <div class="hero-tagline">Juegos educativos para el <span>salón de clases</span></div>
+  <div class="hero-sub">Plataforma de juegos HTML para maestros y alumnos. Matemáticas, ciencias, geografía y más — directo en el navegador, sin instalación.</div>
+  <div class="hero-ctas">
+    <a class="cta-primary" href="login.html">🎮 Acceder a los juegos</a>
+    <a class="cta-secondary" href="#demo">▼ Probar demo</a>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num">15</div><div class="stat-lbl">Juegos planeados</div></div>
+  <div class="stat"><div class="stat-num">2</div><div class="stat-lbl">Disponibles</div></div>
+  <div class="stat"><div class="stat-num">6</div><div class="stat-lbl">Materias</div></div>
+  <div class="stat"><div class="stat-num">1°–6°</div><div class="stat-lbl">Grados</div></div>
+</div>
+
+<!-- DEMO JUGABLE -->
+<section class="demo-section" id="demo">
+  <div class="demo-head">
+    <div class="demo-eyebrow">Demo interactiva</div>
+    <div class="demo-title">Prueba <span>Multiplica Kart</span></div>
+    <div class="demo-sub">Resuelve 3 multiplicaciones para llegar a la meta. Esta es solo una probadita — en la versión completa hay obstáculos, 6 jugadores, 4 operaciones, historial, y mucho más.</div>
+  </div>
+
+  <div class="demo-game">
+    <div class="demo-game-header">
+      <div class="demo-dot red"></div>
+      <div class="demo-dot yellow"></div>
+      <div class="demo-dot green"></div>
+      <div class="demo-game-title">MULTIPLICA-KART.DEMO</div>
+    </div>
+    <div class="demo-body" style="position:relative;">
+
+      <!-- Pista -->
+      <div class="demo-track">
+        <div class="demo-finish"></div>
+        <div class="demo-token" id="demoToken">🏎️</div>
+      </div>
+
+      <!-- Progreso -->
+      <div class="demo-progress">
+        <span id="demoProgressLbl">Pregunta 1 / 3</span>
+        <div class="demo-progress-bar"><div class="demo-progress-fill" id="demoProgressFill"></div></div>
+      </div>
+
+      <!-- Pregunta -->
+      <div class="demo-question" id="demoQuestion">3 × 4 = ?</div>
+
+      <!-- Opciones -->
+      <div class="demo-options" id="demoOptions"></div>
+
+      <!-- Feedback -->
+      <div class="demo-feedback" id="demoFeedback">¡Selecciona la respuesta correcta!</div>
+
+      <!-- Overlay CTA (aparece al ganar/perder) -->
+      <div class="demo-cta-overlay" id="demoOverlay">
+        <div class="demo-cta-icon" id="demoOvIcon">🏆</div>
+        <div class="demo-cta-title" id="demoOvTitle">¡Llegaste a la meta!</div>
+        <div class="demo-cta-sub" id="demoOvSub">Esto fue solo una probadita. En la plataforma completa hay 15+ juegos, estadísticas, historial y mucho más.</div>
+        <div class="demo-cta-btns">
+          <a class="cta-primary" href="login.html">🔐 Acceder ahora</a>
+          <button class="demo-retry-btn" onclick="resetDemo()">🔄 Jugar de nuevo</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<div class="features-strip">
+  <div class="feat">
+    <div class="feat-ico">🎓</div>
+    <div class="feat-title">Por grado escolar</div>
+    <div class="feat-desc">Dificultad ajustable de 1° a 6° de primaria.</div>
+  </div>
+  <div class="feat">
+    <div class="feat-ico">📱</div>
+    <div class="feat-title">Sin instalación</div>
+    <div class="feat-desc">Funciona en cualquier navegador, PC o tablet.</div>
+  </div>
+  <div class="feat">
+    <div class="feat-ico">👥</div>
+    <div class="feat-title">Multijugador</div>
+    <div class="feat-desc">Hasta 6 alumnos en un solo dispositivo.</div>
+  </div>
+  <div class="feat">
+    <div class="feat-ico">📊</div>
+    <div class="feat-title">Estadísticas</div>
+    <div class="feat-desc">Historial de partidas y progreso del alumno.</div>
+  </div>
+</div>
+
+<!-- CTA FINAL -->
+<section class="cta-section">
+  <div class="cta-box">
+    <div class="cta-title">¿Listo para entrar al <span>salón digital</span>?</div>
+    <div class="cta-sub">Accede con tu cuenta de maestro o alumno para desbloquear todos los juegos, estadísticas y funciones completas.</div>
+    <a class="cta-primary" href="login.html">🔐 Iniciar sesión</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-main">
+    Hecho con ❤️ para el salón de clases · <span>HTML puro · Sin instalación · Gratis</span>
+  </div>
+  <div class="footer-brand">
+    <span class="footer-brand-name">EduGamePlay</span>
+    <span class="footer-version">v 0.2</span>
+  </div>
+  <div class="footer-dev">
+    Desarrollado por <strong>Juan Pariona</strong>
+  </div>
+  <div class="footer-copy">© 2026 Juan Pariona · Todos los derechos reservados</div>
+</footer>
+
+<script>
+// ── ESTRELLAS DE FONDO ──
+const starCount = window.innerWidth < 480 ? 20 : 45;
+for(let i=0;i<starCount;i++){
+  const s=document.createElement('div');s.className='star';
+  const sz=1+Math.random()*1.5;
+  s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${sz}px;height:${sz}px;--dur:${2+Math.random()*4}s;--delay:${Math.random()*5}s;`;
+  document.body.appendChild(s);
+}
+
+// ── DEMO JUGABLE ──
+const DEMO_QUESTIONS = [
+  { a:3, b:4, answer:12 },
+  { a:5, b:6, answer:30 },
+  { a:7, b:8, answer:56 }
+];
+
+let demoIdx = 0;
+let demoWrong = 0;
+let demoLocked = false;
+
+// Audio mínimo
+let demoAC;
+function demoBeep(freq,dur,type='sine',vol=.15){
+  try{
+    if(!demoAC) demoAC=new(window.AudioContext||window.webkitAudioContext)();
+    const o=demoAC.createOscillator(),g=demoAC.createGain();
+    o.connect(g);g.connect(demoAC.destination);
+    o.type=type;o.frequency.value=freq;
+    g.gain.setValueAtTime(vol,demoAC.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,demoAC.currentTime+dur);
+    o.start();o.stop(demoAC.currentTime+dur);
+  }catch(e){}
+}
+function sndOk(){ demoBeep(880,.1,'sine',.15); setTimeout(()=>demoBeep(1100,.15,'sine',.1),100); }
+function sndBad(){ demoBeep(200,.15,'sawtooth',.1); setTimeout(()=>demoBeep(150,.2,'sawtooth',.08),150); }
+function sndWin(){ [523,659,784,1047].forEach((f,i)=>setTimeout(()=>demoBeep(f,.2,'sine',.15),i*150)); }
+
+function genDistractors(correct){
+  const set = new Set([correct]);
+  const opts = [];
+  const deltas = [correct-1, correct+1, correct-2, correct+2, correct-5, correct+5];
+  for(const d of deltas){
+    if(d>0 && !set.has(d)){ set.add(d); opts.push(d); }
+    if(opts.length>=3) break;
+  }
+  while(opts.length<3){
+    const v = correct + Math.floor(Math.random()*7)-3;
+    if(v>0 && !set.has(v)){ set.add(v); opts.push(v); }
+  }
+  const all=[correct, ...opts];
+  for(let i=all.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [all[i],all[j]]=[all[j],all[i]]; }
+  return all;
+}
+
+function renderDemoQuestion(){
+  const q = DEMO_QUESTIONS[demoIdx];
+  document.getElementById('demoQuestion').textContent = `${q.a} × ${q.b} = ?`;
+  document.getElementById('demoProgressLbl').textContent = `Pregunta ${demoIdx+1} / ${DEMO_QUESTIONS.length}`;
+  document.getElementById('demoProgressFill').style.width = `${(demoIdx/DEMO_QUESTIONS.length)*100}%`;
+  document.getElementById('demoFeedback').textContent = '¡Selecciona la respuesta correcta!';
+  document.getElementById('demoFeedback').className = 'demo-feedback';
+
+  const grid = document.getElementById('demoOptions');
+  grid.innerHTML = '';
+  const options = genDistractors(q.answer);
+  options.forEach(val=>{
+    const btn = document.createElement('button');
+    btn.className = 'demo-opt';
+    btn.textContent = val;
+    btn.onclick = ()=>selectDemoOption(btn, val, q.answer);
+    grid.appendChild(btn);
+  });
+  demoLocked = false;
+}
+
+function selectDemoOption(btn, val, correct){
+  if(demoLocked) return;
+  demoLocked = true;
+  document.querySelectorAll('.demo-opt').forEach(b=>b.disabled=true);
+  const fb = document.getElementById('demoFeedback');
+  if(val === correct){
+    btn.classList.add('correct');
+    sndOk();
+    fb.textContent = '✓ ¡Correcto! Avanzando...';
+    fb.className = 'demo-feedback ok';
+    moveTokenForward();
+    setTimeout(()=>{
+      demoIdx++;
+      if(demoIdx >= DEMO_QUESTIONS.length) finishDemo(true);
+      else renderDemoQuestion();
+    }, 900);
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.demo-opt').forEach(b=>{ if(parseInt(b.textContent)===correct) b.classList.add('reveal'); });
+    sndBad();
+    demoWrong++;
+    fb.textContent = `✗ Era ${correct}. Sigamos...`;
+    fb.className = 'demo-feedback fail';
+    setTimeout(()=>{
+      demoIdx++;
+      if(demoIdx >= DEMO_QUESTIONS.length) finishDemo(true);
+      else renderDemoQuestion();
+    }, 1400);
+  }
+}
+
+function moveTokenForward(){
+  const tok = document.getElementById('demoToken');
+  const track = tok.parentElement;
+  const trackW = track.offsetWidth;
+  const tokenW = 48;
+  const finishW = 28;
+  const correctSoFar = (demoIdx+1) - demoWrong;
+  const progress = (demoIdx+1) / DEMO_QUESTIONS.length;
+  const maxX = trackW - tokenW - finishW;
+  tok.style.left = Math.min(maxX, progress*maxX + 4) + 'px';
+}
+
+function finishDemo(reached){
+  document.getElementById('demoProgressFill').style.width = '100%';
+  sndWin();
+  const overlay = document.getElementById('demoOverlay');
+  const icon = document.getElementById('demoOvIcon');
+  const title = document.getElementById('demoOvTitle');
+  const sub = document.getElementById('demoOvSub');
+  if(demoWrong === 0){
+    icon.textContent = '🏆';
+    title.textContent = '¡Perfecto! 3/3';
+    sub.textContent = '¡Llegaste a la meta sin fallar! Esto fue solo una probadita. Accede a la plataforma para desbloquear 15+ juegos, modo multijugador, obstáculos y estadísticas.';
+  } else if(demoWrong <= 1){
+    icon.textContent = '🥈';
+    title.textContent = '¡Muy bien! Llegaste';
+    sub.textContent = 'Llegaste a la meta. En la plataforma completa hay obstáculos, power-ups y modo multijugador con hasta 6 jugadores.';
+  } else {
+    icon.textContent = '🎯';
+    title.textContent = '¡Buena práctica!';
+    sub.textContent = 'Cada partida te hace mejor. En la plataforma completa puedes elegir grado escolar, operación y competir con tus compañeros.';
+  }
+  overlay.classList.add('show');
+}
+
+function resetDemo(){
+  demoIdx = 0;
+  demoWrong = 0;
+  demoLocked = false;
+  document.getElementById('demoOverlay').classList.remove('show');
+  document.getElementById('demoToken').style.left = '4px';
+  renderDemoQuestion();
+}
+
+// Iniciar demo
+renderDemoQuestion();
+</script>
+
+</body>
+</html>
