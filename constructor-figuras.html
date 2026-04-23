@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-09YP073NX2"></script>
+<script>
+window.dataLayer=window.dataLayer||[];
+function gtag(){dataLayer.push(arguments);}
+gtag("js",new Date());
+gtag("config","G-09YP073NX2");
+</script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+<title>Constructor de Figuras — EduGamePlay</title>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --space:#0a0a23;--space2:#13133e;--space3:#1e1e5c;
+  --neon-cyan:#22d3ee;--neon-mag:#e879f9;--neon-yel:#fde047;
+  --neon-pink:#f472b6;--neon-green:#4ade80;
+  --planet1:#a855f7;--planet2:#06b6d4;
+  --text:#e0e7ff;--muted:#7a82b8;
+  --border:rgba(167,139,250,.15);
+  --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100vh;}
+body{
+  font-family:'Space Grotesk',sans-serif;
+  background:var(--space);color:var(--text);
+  min-height:100vh;
+  background-image:
+    radial-gradient(ellipse at top left,rgba(168,85,247,.18),transparent 50%),
+    radial-gradient(ellipse at bottom right,rgba(6,182,212,.15),transparent 50%),
+    radial-gradient(ellipse at center,rgba(232,121,249,.08),transparent 70%);
+  overflow-x:hidden;
+}
+
+/* Stars background */
+.spx-star{position:fixed;background:#fff;pointer-events:none;border-radius:50%;animation:twinkle var(--dur,3s) ease-in-out infinite var(--delay,0s);z-index:0;}
+@keyframes twinkle{0%,100%{opacity:0;}50%{opacity:.7;}}
+
+/* Floating planets bg */
+.bg-planet{
+  position:fixed;border-radius:50%;pointer-events:none;
+  filter:blur(2px);opacity:.18;z-index:0;
+  animation:floatBg 20s ease-in-out infinite;
+}
+.bg-planet.p1{
+  width:200px;height:200px;
+  background:radial-gradient(circle at 30% 30%,var(--planet1),var(--space2));
+  top:10%;left:5%;
+}
+.bg-planet.p2{
+  width:140px;height:140px;
+  background:radial-gradient(circle at 30% 30%,var(--planet2),var(--space2));
+  bottom:15%;right:8%;
+  animation-delay:-10s;
+}
+@keyframes floatBg{0%,100%{transform:translate(0,0);}50%{transform:translate(20px,-20px);}}
+
+/* ═══ AUTH HEADER ═══ */
+#auth-loading{position:fixed;inset:0;background:var(--space);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font-family:'Space Grotesk',sans-serif;color:var(--muted);font-size:13px;}
+#auth-loading .spinner{width:40px;height:40px;border:3px solid rgba(34,211,238,.2);border-top-color:var(--neon-cyan);border-radius:50%;animation:authSpin .8s linear infinite;}
+@keyframes authSpin{to{transform:rotate(360deg);}}
+#user-header{display:none;align-items:center;gap:10px;background:#04041a;border-bottom:1px solid var(--border);padding:8px 16px;min-height:40px;position:sticky;top:0;z-index:50;flex-wrap:wrap;}
+#user-greet{display:flex;align-items:center;gap:6px;flex:1;min-width:0;font-size:13px;color:var(--text);}
+#user-greet .u-wave{font-size:15px;}
+#user-greet .u-name{font-weight:700;color:var(--neon-cyan);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#user-greet .u-role{font-size:11px;color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:20px;padding:2px 8px;white-space:nowrap;}
+.hdr-btn{font-size:12px;font-weight:700;font-family:'Space Grotesk',sans-serif;padding:6px 12px;border-radius:8px;background:rgba(168,85,247,.15);color:var(--planet1);border:1px solid rgba(168,85,247,.3);text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px;-webkit-tap-highlight-color:transparent;transition:background .15s;}
+.hdr-btn:hover,.hdr-btn:active{background:rgba(168,85,247,.25);}
+.hdr-btn.logout{background:rgba(244,114,182,.1);color:var(--neon-pink);border-color:rgba(244,114,182,.25);}
+.hdr-btn.logout:hover,.hdr-btn.logout:active{background:rgba(244,114,182,.2);}
+@media(max-width:480px){#user-greet .u-role{display:none;}#user-greet{font-size:12px;}.hdr-btn{padding:5px 10px;font-size:11px;}}
+
+/* App container */
+#app{max-width:720px;margin:0 auto;padding:18px;position:relative;z-index:1;}
+
+/* ═══ SETUP ═══ */
+#setup{text-align:center;padding:14px 0;}
+.game-logo{
+  font-family:'Audiowide',cursive;
+  font-size:clamp(28px,7vw,44px);
+  background:linear-gradient(135deg,var(--neon-cyan) 0%,var(--neon-mag) 50%,var(--neon-yel) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin:24px 0 4px;letter-spacing:2px;line-height:1.1;
+  filter:drop-shadow(0 0 20px rgba(168,85,247,.4));
+}
+.game-tagline{
+  font-family:'Audiowide',cursive;
+  font-size:clamp(10px,2.5vw,12px);
+  color:var(--neon-cyan);letter-spacing:4px;
+  margin-bottom:32px;text-transform:uppercase;
+}
+
+.setup-card{
+  background:rgba(19,19,62,.6);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius);
+  padding:18px;margin-bottom:14px;
+  backdrop-filter:blur(10px);
+  text-align:left;
+}
+.setup-label{
+  font-family:'Audiowide',cursive;
+  font-size:11px;color:var(--neon-cyan);
+  letter-spacing:2px;margin-bottom:14px;
+  text-transform:uppercase;
+}
+
+.player-input{
+  width:100%;padding:12px 14px;
+  font-family:'Space Grotesk',sans-serif;font-size:15px;
+  background:rgba(0,0,0,.4);color:var(--text);
+  border:1.5px solid var(--border);border-radius:8px;
+  outline:none;min-height:46px;
+}
+.player-input:focus{border-color:var(--neon-cyan);box-shadow:0 0 12px rgba(34,211,238,.3);}
+
+/* Grade selector */
+.grade-row{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
+.gr-btn{
+  padding:14px 6px;border:2px solid var(--border);
+  border-radius:10px;background:rgba(0,0,0,.4);
+  color:var(--muted);cursor:pointer;
+  font-family:'Audiowide',cursive;font-size:18px;
+  text-align:center;transition:all .15s;min-height:60px;
+  -webkit-tap-highlight-color:transparent;
+  position:relative;
+}
+.gr-btn .gr-num{display:block;line-height:1;}
+.gr-btn .gr-mode{font-family:'Space Grotesk',sans-serif;font-size:9px;display:block;margin-top:4px;font-weight:600;letter-spacing:.5px;opacity:.7;}
+.gr-btn:active{transform:scale(.95);}
+.gr-btn.active{
+  background:linear-gradient(135deg,rgba(168,85,247,.25),rgba(34,211,238,.15));
+  border-color:var(--neon-cyan);color:var(--neon-cyan);
+  box-shadow:0 0 16px rgba(34,211,238,.3);
+}
+.gr-btn.active .gr-mode{opacity:1;color:var(--neon-cyan);}
+
+.mode-desc{
+  margin-top:14px;padding:10px 14px;
+  background:rgba(168,85,247,.08);
+  border:1px solid rgba(168,85,247,.2);
+  border-radius:8px;
+  font-size:12px;color:var(--muted);line-height:1.6;
+}
+.mode-desc strong{color:var(--neon-cyan);}
+
+.start-btn{
+  width:100%;
+  background:linear-gradient(135deg,var(--neon-mag) 0%,var(--planet1) 50%,var(--neon-cyan) 100%);
+  color:#fff;
+  font-family:'Audiowide',cursive;
+  font-size:clamp(14px,3.5vw,18px);
+  padding:16px;border:none;border-radius:10px;
+  cursor:pointer;margin-top:10px;
+  letter-spacing:2px;text-transform:uppercase;
+  box-shadow:0 0 30px rgba(168,85,247,.4);
+  transition:transform .1s,box-shadow .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.start-btn:active{transform:scale(.98);}
+.start-btn:hover{box-shadow:0 0 50px rgba(168,85,247,.6);}
+
+.back-link{display:block;text-align:center;padding:14px;color:var(--muted);font-size:12px;text-decoration:none;letter-spacing:1px;}
+.back-link:hover{color:var(--neon-cyan);}
+
+/* ═══ GAME SCREEN ═══ */
+#game{display:none;}
+
+/* HUD */
+.hud{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;
+  background:rgba(19,19,62,.6);
+  border:1.5px solid var(--border);
+  border-radius:10px;
+  margin-bottom:10px;
+  flex-wrap:wrap;
+  backdrop-filter:blur(8px);
+}
+.lives{display:flex;gap:4px;}
+.heart{font-size:18px;transition:all .3s;}
+.heart.lost{opacity:.2;filter:grayscale(1);}
+.hud-progress{
+  flex:1;min-width:100px;
+  display:flex;align-items:center;gap:8px;
+  font-family:'Audiowide',cursive;font-size:11px;
+  color:var(--neon-cyan);letter-spacing:1.5px;
+}
+.hud-progress-bar{
+  flex:1;height:6px;background:rgba(0,0,0,.5);
+  border-radius:3px;overflow:hidden;
+  border:1px solid var(--border);
+}
+.hud-progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--neon-cyan),var(--neon-mag));
+  transition:width .4s;width:0%;
+}
+.hud-grade{
+  font-family:'Audiowide',cursive;font-size:11px;
+  color:var(--neon-mag);
+  background:rgba(232,121,249,.1);
+  border:1px solid rgba(232,121,249,.3);
+  border-radius:20px;padding:4px 10px;
+  letter-spacing:1.5px;
+}
+
+/* Question panel */
+.question-panel{
+  background:rgba(19,19,62,.6);
+  border:1.5px solid var(--neon-cyan);
+  border-radius:var(--radius);
+  padding:16px;
+  margin-bottom:10px;
+  position:relative;
+  backdrop-filter:blur(8px);
+  box-shadow:0 0 24px rgba(34,211,238,.15);
+}
+.q-tag{
+  display:inline-block;
+  font-family:'Audiowide',cursive;font-size:9px;
+  color:var(--neon-cyan);letter-spacing:2px;
+  background:rgba(34,211,238,.1);
+  border:1px solid rgba(34,211,238,.3);
+  padding:3px 10px;border-radius:20px;
+  margin-bottom:10px;
+}
+.q-text{
+  font-family:'Audiowide',cursive;
+  font-size:clamp(14px,4vw,18px);
+  color:var(--text);
+  margin-bottom:14px;
+  line-height:1.4;
+}
+.q-text .q-emph{color:var(--neon-yel);}
+
+/* Figures display area */
+.figures-area{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+  margin-bottom:10px;
+}
+.figures-area.cols-3{grid-template-columns:repeat(3,1fr);}
+.figures-area.single{grid-template-columns:1fr;justify-items:center;}
+
+.fig-card{
+  background:rgba(0,0,0,.4);
+  border:2px solid var(--border);
+  border-radius:12px;
+  padding:14px;
+  cursor:pointer;
+  transition:all .15s;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:120px;
+  -webkit-tap-highlight-color:transparent;
+  position:relative;overflow:hidden;
+}
+.fig-card:active{transform:scale(.96);}
+.fig-card:hover{border-color:var(--neon-cyan);background:rgba(34,211,238,.06);}
+.fig-card.correct{
+  border-color:var(--neon-green);background:rgba(74,222,128,.15);
+  box-shadow:0 0 20px rgba(74,222,128,.3);animation:correctPulse .5s ease;
+}
+.fig-card.wrong{
+  border-color:var(--neon-pink);background:rgba(244,114,182,.15);
+  animation:wrongShake .5s ease;
+}
+@keyframes correctPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+@keyframes wrongShake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+
+.fig-svg{width:80px;height:80px;}
+.fig-label{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:13px;font-weight:600;
+  color:var(--text);margin-top:8px;
+}
+
+/* Big single figure (counting mode) */
+.fig-display-big{
+  background:rgba(0,0,0,.4);
+  border:2px solid var(--neon-cyan);
+  border-radius:12px;
+  padding:30px;
+  margin-bottom:14px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 24px rgba(34,211,238,.2) inset;
+}
+.fig-display-big svg{width:140px;height:140px;}
+
+/* Counting input */
+.count-input-row{
+  display:flex;gap:10px;align-items:center;justify-content:center;
+  margin-top:10px;
+}
+.count-input{
+  width:80px;padding:14px;
+  font-family:'Audiowide',cursive;font-size:24px;
+  text-align:center;
+  background:rgba(0,0,0,.5);color:var(--neon-yel);
+  border:2px solid var(--neon-cyan);border-radius:8px;
+  outline:none;min-height:54px;
+}
+.count-input:focus{border-color:var(--neon-mag);box-shadow:0 0 16px rgba(232,121,249,.4);}
+.count-submit{
+  background:linear-gradient(135deg,var(--neon-cyan),var(--planet2));
+  color:#000;font-family:'Audiowide',cursive;
+  font-size:13px;padding:14px 22px;
+  border:none;border-radius:8px;cursor:pointer;
+  letter-spacing:1.5px;min-height:54px;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .1s;
+}
+.count-submit:active{transform:scale(.96);}
+.count-submit:disabled{opacity:.4;cursor:not-allowed;}
+
+/* Classify mode (grade 4) */
+.classify-zones{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:10px;margin-bottom:14px;
+}
+.drop-zone{
+  background:rgba(0,0,0,.4);
+  border:2px dashed var(--border);
+  border-radius:10px;
+  padding:14px 10px;
+  min-height:120px;
+  text-align:center;
+  transition:all .2s;
+}
+.drop-zone.over{
+  border-color:var(--neon-cyan);
+  background:rgba(34,211,238,.1);
+  box-shadow:0 0 16px rgba(34,211,238,.2) inset;
+}
+.drop-zone-label{
+  font-family:'Audiowide',cursive;font-size:10px;
+  letter-spacing:1.5px;color:var(--neon-mag);
+  margin-bottom:8px;
+}
+.drop-zone-items{
+  display:flex;flex-wrap:wrap;gap:6px;justify-content:center;
+  min-height:50px;
+}
+.drop-zone-items .draggable{cursor:default;opacity:.85;}
+
+.draggable-pool{
+  background:rgba(0,0,0,.4);
+  border:1.5px solid var(--border);
+  border-radius:10px;
+  padding:12px;
+  display:flex;flex-wrap:wrap;gap:8px;justify-content:center;
+  margin-bottom:10px;min-height:80px;
+}
+.draggable{
+  width:54px;height:54px;
+  background:rgba(34,211,238,.08);
+  border:2px solid rgba(34,211,238,.3);
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:grab;user-select:none;
+  transition:transform .15s,box-shadow .15s;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:none;
+}
+.draggable:active{cursor:grabbing;transform:scale(.95);}
+.draggable.dragging{opacity:.5;box-shadow:0 0 20px rgba(34,211,238,.6);}
+.draggable svg{width:36px;height:36px;}
+
+/* Construct mode (grades 5-6) - SVG canvas */
+.construct-canvas{
+  background:radial-gradient(circle at 50% 50%,rgba(168,85,247,.06),transparent 70%),rgba(0,0,0,.5);
+  border:2px solid var(--neon-cyan);
+  border-radius:12px;
+  padding:0;
+  margin-bottom:10px;
+  position:relative;
+  height:280px;
+  overflow:hidden;
+}
+.construct-canvas svg{width:100%;height:100%;display:block;}
+.canvas-grid line{stroke:rgba(167,139,250,.1);stroke-width:.5;}
+.canvas-target{
+  fill:none;stroke:rgba(232,121,249,.4);
+  stroke-width:1.5;stroke-dasharray:4;
+  pointer-events:none;
+}
+.canvas-shape{
+  fill:rgba(34,211,238,.15);
+  stroke:var(--neon-cyan);stroke-width:2;
+}
+.canvas-vertex{
+  fill:var(--neon-yel);stroke:#000;stroke-width:1;
+  cursor:grab;r:8;
+  filter:drop-shadow(0 0 4px var(--neon-yel));
+}
+.canvas-vertex:hover{r:10;}
+.canvas-vertex.dragging{cursor:grabbing;fill:var(--neon-mag);}
+
+.construct-info{
+  display:flex;justify-content:space-around;
+  font-family:'Audiowide',cursive;font-size:10px;
+  color:var(--muted);letter-spacing:1px;
+  background:rgba(0,0,0,.4);
+  border:1px solid var(--border);
+  border-radius:8px;padding:8px;margin-bottom:10px;
+}
+.construct-info-row{text-align:center;}
+.construct-info-row .ci-val{
+  display:block;font-size:14px;color:var(--neon-cyan);
+  margin-top:2px;
+}
+.construct-info-row.ok .ci-val{color:var(--neon-green);}
+.construct-info-row.bad .ci-val{color:var(--neon-pink);}
+
+.verify-btn{
+  width:100%;
+  background:linear-gradient(135deg,var(--neon-yel),var(--neon-mag));
+  color:#000;font-family:'Audiowide',cursive;
+  font-size:14px;padding:14px;
+  border:none;border-radius:10px;cursor:pointer;
+  letter-spacing:2px;min-height:50px;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .1s;
+}
+.verify-btn:active{transform:scale(.98);}
+.verify-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* Feedback */
+.feedback{
+  text-align:center;
+  font-family:'Audiowide',cursive;font-size:12px;
+  letter-spacing:1.5px;
+  min-height:24px;
+  margin-top:8px;
+}
+.feedback.hit{color:var(--neon-green);}
+.feedback.miss{color:var(--neon-pink);}
+
+/* ═══ OVERLAYS ═══ */
+.overlay{
+  position:fixed;inset:0;z-index:100;
+  display:none;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.92);padding:20px;
+  backdrop-filter:blur(8px);
+}
+.overlay.show{display:flex;}
+.overlay-box{
+  background:linear-gradient(135deg,rgba(19,19,62,.95),rgba(30,30,92,.95));
+  border:2px solid var(--neon-cyan);
+  border-radius:16px;
+  padding:clamp(24px,5vw,36px);
+  text-align:center;
+  max-width:400px;width:100%;
+  box-shadow:0 0 60px rgba(168,85,247,.4);
+}
+.ov-icon{font-size:clamp(48px,12vw,72px);margin-bottom:14px;line-height:1;}
+.ov-title{
+  font-family:'Audiowide',cursive;
+  font-size:clamp(16px,4vw,22px);
+  letter-spacing:2px;
+  background:linear-gradient(135deg,var(--neon-cyan),var(--neon-mag));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:10px;
+}
+.ov-stars{font-size:32px;margin:14px 0;letter-spacing:6px;}
+.ov-sub{font-size:14px;color:var(--text);margin-bottom:10px;line-height:1.6;}
+.ov-stat-block{
+  background:rgba(0,0,0,.4);border-radius:8px;
+  padding:12px;margin-bottom:14px;
+  font-family:'Space Grotesk',sans-serif;font-size:13px;
+}
+.ov-stat-row{
+  display:flex;justify-content:space-between;
+  padding:4px 0;border-bottom:1px dashed var(--border);
+}
+.ov-stat-row:last-child{border-bottom:none;}
+.ov-stat-row .v{color:var(--neon-cyan);font-weight:700;}
+
+.ov-btn{
+  background:linear-gradient(135deg,var(--neon-mag),var(--planet1));
+  color:#fff;border:none;
+  border-radius:10px;font-family:'Audiowide',cursive;
+  font-size:12px;padding:14px 22px;cursor:pointer;
+  margin:4px;letter-spacing:1.5px;
+  min-height:48px;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .1s;
+}
+.ov-btn.sec{
+  background:transparent;border:1.5px solid var(--muted);
+  color:var(--muted);
+}
+.ov-btn:active{transform:scale(.97);}
+
+/* Footer */
+.footer-game{text-align:center;padding:24px 16px;border-top:1px solid var(--border);color:#666;font-size:12px;line-height:1.8;background:rgba(4,4,26,.8);margin-top:30px;}
+.footer-game-brand{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:30px;padding:6px 16px;margin:6px 0;}
+.footer-game-name{font-family:'Audiowide',cursive;font-size:13px;color:var(--neon-cyan);letter-spacing:1.5px;}
+.footer-game-ver{font-size:10px;background:rgba(168,85,247,.15);color:var(--planet1);border:1px solid rgba(168,85,247,.3);border-radius:10px;padding:2px 7px;font-weight:700;letter-spacing:1px;}
+.footer-game-dev{font-size:11px;color:#666;}
+.footer-game-dev strong{color:#aaa;font-weight:600;}
+.footer-game-copy{font-size:10px;color:#555;margin-top:2px;letter-spacing:.5px;}
+</style>
+</head>
+<body>
+
+<!-- Auth -->
+<div id="auth-loading">
+  <div class="spinner"></div>
+  <div>Verificando sesión...</div>
+</div>
+
+<div id="user-header">
+  <div id="user-greet">
+    <span class="u-wave">👋</span>
+    <span>Hola,&nbsp;</span>
+    <span class="u-name" id="userName">—</span>
+    <span class="u-role" id="userRole"></span>
+  </div>
+  <a class="hdr-btn" href="dashboard.html">🎮 Juegos</a>
+  <a class="hdr-btn" href="admin.html" id="adminBtn" style="display:none;">📊 Admin</a>
+  <button class="hdr-btn logout" id="logoutBtn">↪ Salir</button>
+</div>
+
+<!-- Bg planets -->
+<div class="bg-planet p1"></div>
+<div class="bg-planet p2"></div>
+
+<div id="app">
+
+<!-- ═══ SETUP ═══ -->
+<div id="setup">
+  <div class="game-logo">CONSTRUCTOR<br>DE FIGURAS</div>
+  <div class="game-tagline">— GEOMETRÍA INTERESTELAR —</div>
+
+  <div class="setup-card">
+    <div class="setup-label">★ TU NOMBRE</div>
+    <input class="player-input" type="text" id="pName" placeholder="Astronauta..." maxlength="20" autocomplete="off"/>
+  </div>
+
+  <div class="setup-card">
+    <div class="setup-label">★ ELIGE TU PLANETA (GRADO)</div>
+    <div class="grade-row">
+      <button class="gr-btn active" data-grade="2">
+        <span class="gr-num">2°</span>
+        <span class="gr-mode">Identifica</span>
+      </button>
+      <button class="gr-btn" data-grade="3">
+        <span class="gr-num">3°</span>
+        <span class="gr-mode">Cuenta</span>
+      </button>
+      <button class="gr-btn" data-grade="4">
+        <span class="gr-num">4°</span>
+        <span class="gr-mode">Clasifica</span>
+      </button>
+      <button class="gr-btn" data-grade="5">
+        <span class="gr-num">5°</span>
+        <span class="gr-mode">Construye</span>
+      </button>
+      <button class="gr-btn" data-grade="6">
+        <span class="gr-num">6°</span>
+        <span class="gr-mode">Ángulos</span>
+      </button>
+    </div>
+    <div class="mode-desc" id="modeDesc">
+      <strong>2° grado · Identifica:</strong> Reconoce las figuras geométricas básicas tocando la correcta.
+    </div>
+  </div>
+
+  <button class="start-btn" id="startBtn">🚀 INICIAR MISIÓN</button>
+  <a class="back-link" href="dashboard.html">← Volver al catálogo</a>
+</div>
+
+<!-- ═══ GAME ═══ -->
+<div id="game">
+  <div class="hud">
+    <div class="lives" id="lives">
+      <span class="heart">❤️</span>
+      <span class="heart">❤️</span>
+      <span class="heart">❤️</span>
+    </div>
+    <div class="hud-progress">
+      <span id="progressTxt">1/10</span>
+      <div class="hud-progress-bar"><div class="hud-progress-fill" id="progressFill"></div></div>
+    </div>
+    <div class="hud-grade" id="hudGrade">2°</div>
+  </div>
+
+  <div class="question-panel">
+    <div class="q-tag" id="qTag">RETO</div>
+    <div class="q-text" id="qText">Toca la figura correcta</div>
+    <div id="qContent"></div>
+    <div class="feedback" id="feedback">&nbsp;</div>
+  </div>
+</div>
+
+<!-- Win overlay -->
+<div class="overlay" id="ovWin">
+  <div class="overlay-box">
+    <div class="ov-icon">🏆</div>
+    <div class="ov-title" id="winTitle">¡MISIÓN COMPLETADA!</div>
+    <div class="ov-stars" id="winStars">⭐⭐⭐</div>
+    <div class="ov-sub" id="winSub">Eres un maestro geómetra.</div>
+    <div class="ov-stat-block" id="winStats"></div>
+    <button class="ov-btn" id="nextLvlBtn">▶ SIGUIENTE PLANETA</button>
+    <button class="ov-btn sec" id="menuBtn">⚙️ MENÚ</button>
+  </div>
+</div>
+
+<!-- GameOver overlay -->
+<div class="overlay" id="ovLose">
+  <div class="overlay-box">
+    <div class="ov-icon">💥</div>
+    <div class="ov-title">MISIÓN FALLIDA</div>
+    <div class="ov-sub" id="loseSub">Tu nave fue destruida. ¿Reintentas?</div>
+    <button class="ov-btn" id="retryBtn">🔄 REINTENTAR</button>
+    <button class="ov-btn sec" id="menuBtn2">⚙️ MENÚ</button>
+  </div>
+</div>
+
+</div>
+
+<div class="footer-game">
+  <div>Hecho con ❤️ para el salón de clases · HTML puro · Sin instalación · Gratis</div>
+  <div class="footer-game-brand">
+    <span class="footer-game-name">EduGamePlay</span>
+    <span class="footer-game-ver">v 0.3</span>
+  </div>
+  <div class="footer-game-dev">Desarrollado por <strong>Juan Pariona</strong></div>
+  <div class="footer-game-copy">© 2026 Juan Pariona · Todos los derechos reservados</div>
+</div>
+
+<!-- ═══ AUTH SCRIPT ═══ -->
+<script type="module">
+import { requireAuth, logout, getDisplayName, getRoleLabel } from './js/auth.js';
+
+let authUser = null;
+try {
+  const user = await requireAuth();
+  authUser = user;
+  window.AUTH_USER = user;
+  document.getElementById('userName').textContent = getDisplayName(user);
+  document.getElementById('userRole').textContent = getRoleLabel(user.rol);
+  const pn = document.getElementById('pName');
+  if(pn && !pn.value){ pn.value = getDisplayName(user); }
+  if(user.rol === 'admin'){ document.getElementById('adminBtn').style.display = 'inline-flex'; }
+  document.getElementById('logoutBtn').addEventListener('click', async ()=>{
+    if(confirm('¿Cerrar sesión?')) await logout('index.html');
+  });
+  document.getElementById('auth-loading').style.display = 'none';
+  document.getElementById('user-header').style.display = 'flex';
+} catch(err){ console.error('Auth error:', err); }
+</script>
+
+<!-- ═══ GAME LOGIC ═══ -->
+<script type="module">
+import { db } from './js/firebase-config.js';
+import { collection, addDoc, doc, updateDoc, increment, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// Stars
+const sc = window.innerWidth < 480 ? 25 : 50;
+for(let i=0;i<sc;i++){
+  const s=document.createElement('div');s.className='spx-star';
+  const sz=1+Math.random()*1.5;
+  s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${sz}px;height:${sz}px;--dur:${2+Math.random()*4}s;--delay:${Math.random()*5}s;`;
+  document.body.appendChild(s);
+}
+
+// Audio
+let AC;
+function getAC(){ if(!AC) AC=new(window.AudioContext||window.webkitAudioContext)(); return AC; }
+function beep(f,d,t='sine',v=.1){ try{ const ac=getAC(),o=ac.createOscillator(),g=ac.createGain(); o.connect(g);g.connect(ac.destination); o.type=t;o.frequency.value=f; g.gain.setValueAtTime(v,ac.currentTime); g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d); o.start();o.stop(ac.currentTime+d);}catch(e){}}
+function sndOk(){ [600,800,1200].forEach((f,i)=>setTimeout(()=>beep(f,.08,'sine',.12),i*60)); }
+function sndBad(){ beep(200,.2,'sawtooth',.1); }
+function sndWin(){ [523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>beep(f,.18,'square',.12),i*100)); }
+function sndPick(){ beep(800,.05,'sine',.08); }
+function sndDrop(){ beep(500,.08,'square',.08); }
+
+// ═══ FIGURE LIBRARY (SVG) ═══
+const FIG = {
+  triangulo:{
+    name:'Triángulo', sides:3, vertices:3, polygon:true, type:'triangulo',
+    svg:'<polygon points="50,15 90,80 10,80" fill="rgba(34,211,238,.25)" stroke="#22d3ee" stroke-width="3"/>'
+  },
+  cuadrado:{
+    name:'Cuadrado', sides:4, vertices:4, polygon:true, type:'cuadrilatero',
+    svg:'<rect x="20" y="20" width="60" height="60" fill="rgba(232,121,249,.25)" stroke="#e879f9" stroke-width="3"/>'
+  },
+  rectangulo:{
+    name:'Rectángulo', sides:4, vertices:4, polygon:true, type:'cuadrilatero',
+    svg:'<rect x="10" y="30" width="80" height="40" fill="rgba(168,85,247,.25)" stroke="#a855f7" stroke-width="3"/>'
+  },
+  pentagono:{
+    name:'Pentágono', sides:5, vertices:5, polygon:true, type:'pentagono',
+    svg:'<polygon points="50,10 90,40 75,85 25,85 10,40" fill="rgba(253,224,71,.25)" stroke="#fde047" stroke-width="3"/>'
+  },
+  hexagono:{
+    name:'Hexágono', sides:6, vertices:6, polygon:true, type:'hexagono',
+    svg:'<polygon points="50,10 85,30 85,70 50,90 15,70 15,30" fill="rgba(244,114,182,.25)" stroke="#f472b6" stroke-width="3"/>'
+  },
+  circulo:{
+    name:'Círculo', sides:0, vertices:0, polygon:false, type:'circulo',
+    svg:'<circle cx="50" cy="50" r="40" fill="rgba(74,222,128,.25)" stroke="#4ade80" stroke-width="3"/>'
+  },
+  ovalo:{
+    name:'Óvalo', sides:0, vertices:0, polygon:false, type:'ovalo',
+    svg:'<ellipse cx="50" cy="50" rx="42" ry="28" fill="rgba(34,211,238,.2)" stroke="#22d3ee" stroke-width="3"/>'
+  },
+  rombo:{
+    name:'Rombo', sides:4, vertices:4, polygon:true, type:'cuadrilatero',
+    svg:'<polygon points="50,10 90,50 50,90 10,50" fill="rgba(232,121,249,.25)" stroke="#e879f9" stroke-width="3"/>'
+  },
+  trapecio:{
+    name:'Trapecio', sides:4, vertices:4, polygon:true, type:'cuadrilatero',
+    svg:'<polygon points="20,20 80,20 95,80 5,80" fill="rgba(168,85,247,.25)" stroke="#a855f7" stroke-width="3"/>'
+  }
+};
+
+// State
+let cfg = { grade:2, name:'Astronauta' };
+let state = null;
+
+// Mode descriptions
+const MODE_DESC = {
+  2:'<strong>2° grado · Identifica:</strong> Reconoce las figuras geométricas básicas tocando la correcta.',
+  3:'<strong>3° grado · Cuenta:</strong> Cuenta los lados y vértices de cada figura.',
+  4:'<strong>4° grado · Clasifica:</strong> Arrastra las figuras a su categoría correcta.',
+  5:'<strong>5° grado · Construye:</strong> Mueve los vértices para formar la figura pedida.',
+  6:'<strong>6° grado · Ángulos:</strong> Construye figuras con ángulos exactos. Modo experto.'
+};
+
+// ═══ SETUP HANDLERS ═══
+document.querySelectorAll('.gr-btn').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('.gr-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    cfg.grade = parseInt(b.dataset.grade);
+    document.getElementById('modeDesc').innerHTML = MODE_DESC[cfg.grade];
+  };
+});
+
+document.getElementById('startBtn').onclick = ()=>{
+  cfg.name = document.getElementById('pName').value.trim() || 'Astronauta';
+  startGame();
+};
+document.getElementById('nextLvlBtn').onclick = ()=>{
+  document.getElementById('ovWin').classList.remove('show');
+  if(cfg.grade < 6){
+    cfg.grade++;
+    document.querySelectorAll('.gr-btn').forEach(b=>b.classList.toggle('active', parseInt(b.dataset.grade)===cfg.grade));
+  }
+  startGame();
+};
+document.getElementById('retryBtn').onclick = ()=>{
+  document.getElementById('ovLose').classList.remove('show');
+  startGame();
+};
+document.getElementById('menuBtn').onclick = backToMenu;
+document.getElementById('menuBtn2').onclick = backToMenu;
+
+function backToMenu(){
+  document.getElementById('ovWin').classList.remove('show');
+  document.getElementById('ovLose').classList.remove('show');
+  document.getElementById('game').style.display='none';
+  document.getElementById('setup').style.display='block';
+}
+
+// ═══ GAME FLOW ═══
+function startGame(){
+  state = {
+    round:0, totalRounds:10, lives:3, score:0,
+    correct:0, wrong:0,
+    startTime:Date.now(),
+    answered:false
+  };
+  document.getElementById('setup').style.display='none';
+  document.getElementById('game').style.display='block';
+  document.getElementById('hudGrade').textContent = cfg.grade+'°';
+  updateHUD();
+  nextRound();
+}
+
+function updateHUD(){
+  // Lives
+  const hearts = document.querySelectorAll('#lives .heart');
+  hearts.forEach((h,i)=>h.classList.toggle('lost', i>=state.lives));
+  // Progress
+  document.getElementById('progressTxt').textContent = `${state.round}/${state.totalRounds}`;
+  document.getElementById('progressFill').style.width = (state.round/state.totalRounds*100)+'%';
+}
+
+function nextRound(){
+  state.answered = false;
+  state.round++;
+  if(state.round > state.totalRounds){ return showWin(); }
+  updateHUD();
+  document.getElementById('feedback').textContent='\u00A0';
+  document.getElementById('feedback').className='feedback';
+
+  // Generate round depending on grade
+  if(cfg.grade === 2) round_identify();
+  else if(cfg.grade === 3) round_count();
+  else if(cfg.grade === 4) round_classify();
+  else if(cfg.grade === 5) round_construct(false);
+  else round_construct(true); // grade 6 with angles
+}
+
+// Helper: random items
+function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+function shuffle(arr){ return arr.slice().sort(()=>Math.random()-.5); }
+function pickN(arr,n){ return shuffle(arr).slice(0,n); }
+
+// ═══ MODE 2: IDENTIFY (grade 2) ═══
+function round_identify(){
+  const allKeys = Object.keys(FIG);
+  const target = allKeys[rnd(0,allKeys.length-1)];
+  const distractors = pickN(allKeys.filter(k=>k!==target), 3);
+  const opts = shuffle([target, ...distractors]);
+
+  document.getElementById('qTag').textContent = `RETO ${state.round}/${state.totalRounds}`;
+  document.getElementById('qText').innerHTML = `Toca el <span class="q-emph">${FIG[target].name.toUpperCase()}</span>`;
+
+  const html = `<div class="figures-area">${
+    opts.map(k=>`<div class="fig-card" data-key="${k}"><svg class="fig-svg" viewBox="0 0 100 100">${FIG[k].svg}</svg></div>`).join('')
+  }</div>`;
+  document.getElementById('qContent').innerHTML = html;
+
+  document.querySelectorAll('.fig-card').forEach(card=>{
+    card.onclick = ()=>{
+      if(state.answered) return;
+      state.answered = true;
+      const key = card.dataset.key;
+      if(key === target){
+        card.classList.add('correct');
+        registerHit(`✓ ¡Correcto! Es un ${FIG[target].name.toLowerCase()}`);
+      } else {
+        card.classList.add('wrong');
+        document.querySelectorAll('.fig-card').forEach(c=>{
+          if(c.dataset.key === target) c.classList.add('correct');
+        });
+        registerMiss(`✗ Era el ${FIG[target].name.toLowerCase()}`);
+      }
+    };
+  });
+}
+
+// ═══ MODE 3: COUNT (grade 3) ═══
+function round_count(){
+  // Solo polígonos (excluir círculo y óvalo para contar lados)
+  const polyKeys = Object.keys(FIG).filter(k=>FIG[k].polygon);
+  const target = polyKeys[rnd(0,polyKeys.length-1)];
+  const fig = FIG[target];
+  const askLados = Math.random() < 0.5;
+  const correct = askLados ? fig.sides : fig.vertices;
+
+  document.getElementById('qTag').textContent = `RETO ${state.round}/${state.totalRounds}`;
+  document.getElementById('qText').innerHTML = `¿Cuántos <span class="q-emph">${askLados?'lados':'vértices'}</span> tiene esta figura?`;
+
+  document.getElementById('qContent').innerHTML = `
+    <div class="fig-display-big">
+      <svg viewBox="0 0 100 100">${fig.svg}</svg>
+    </div>
+    <div class="count-input-row">
+      <input class="count-input" id="countInp" type="number" inputmode="numeric" min="0" max="20" placeholder="?" autocomplete="off"/>
+      <button class="count-submit" id="countBtn">✓ ENVIAR</button>
+    </div>
+  `;
+
+  const inp = document.getElementById('countInp');
+  const btn = document.getElementById('countBtn');
+  setTimeout(()=>inp.focus(),100);
+
+  const submit = ()=>{
+    if(state.answered) return;
+    const v = parseInt(inp.value);
+    if(isNaN(v)) return;
+    state.answered = true;
+    btn.disabled = true; inp.disabled = true;
+    if(v === correct){
+      registerHit(`✓ ¡Correcto! Tiene ${correct} ${askLados?'lados':'vértices'}`);
+    } else {
+      registerMiss(`✗ Tiene ${correct} ${askLados?'lados':'vértices'} (escribiste ${v})`);
+    }
+  };
+  btn.onclick = submit;
+  inp.onkeydown = e=>{ if(e.key==='Enter') submit(); };
+}
+
+// ═══ MODE 4: CLASSIFY (grade 4) ═══
+function round_classify(){
+  // 2 zonas: polígonos vs no polígonos (alternar tipos según round)
+  const useType = state.round % 2 === 0 ? 'cuadrilateros' : 'poligonos';
+
+  let zoneA, zoneB, items;
+  if(useType === 'poligonos'){
+    zoneA = { label:'POLÍGONOS', match:k=>FIG[k].polygon };
+    zoneB = { label:'NO POLÍGONOS', match:k=>!FIG[k].polygon };
+    const polyKeys = Object.keys(FIG).filter(k=>FIG[k].polygon);
+    const noPolyKeys = Object.keys(FIG).filter(k=>!FIG[k].polygon);
+    items = shuffle([...pickN(polyKeys,3), ...pickN(noPolyKeys,2)]);
+  } else {
+    zoneA = { label:'CUADRILÁTEROS', match:k=>FIG[k].sides===4 };
+    zoneB = { label:'NO CUADRILÁTEROS', match:k=>FIG[k].sides!==4 };
+    const cuadKeys = Object.keys(FIG).filter(k=>FIG[k].sides===4);
+    const noCuadKeys = Object.keys(FIG).filter(k=>FIG[k].sides!==4);
+    items = shuffle([...pickN(cuadKeys,2), ...pickN(noCuadKeys,3)]);
+  }
+
+  document.getElementById('qTag').textContent = `RETO ${state.round}/${state.totalRounds}`;
+  document.getElementById('qText').innerHTML = `Arrastra cada figura a su <span class="q-emph">categoría</span>`;
+
+  document.getElementById('qContent').innerHTML = `
+    <div class="classify-zones">
+      <div class="drop-zone" data-zone="a">
+        <div class="drop-zone-label">${zoneA.label}</div>
+        <div class="drop-zone-items"></div>
+      </div>
+      <div class="drop-zone" data-zone="b">
+        <div class="drop-zone-label">${zoneB.label}</div>
+        <div class="drop-zone-items"></div>
+      </div>
+    </div>
+    <div class="draggable-pool" id="dragPool">
+      ${items.map(k=>`<div class="draggable" draggable="true" data-key="${k}"><svg viewBox="0 0 100 100">${FIG[k].svg}</svg></div>`).join('')}
+    </div>
+    <button class="verify-btn" id="verifyBtn">✓ VERIFICAR</button>
+  `;
+
+  setupDragAndDrop(zoneA, zoneB, items);
+}
+
+function setupDragAndDrop(zoneA, zoneB, items){
+  const pool = document.getElementById('dragPool');
+  const zones = document.querySelectorAll('.drop-zone');
+  let dragged = null;
+  let touchClone = null;
+
+  // Desktop drag events
+  document.querySelectorAll('.draggable').forEach(d=>{
+    d.addEventListener('dragstart', e=>{
+      dragged = d; d.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      sndPick();
+    });
+    d.addEventListener('dragend', ()=>{ d.classList.remove('dragging'); dragged=null; });
+
+    // Touch events (mobile)
+    d.addEventListener('touchstart', e=>{
+      dragged = d;
+      sndPick();
+      const t = e.touches[0];
+      touchClone = d.cloneNode(true);
+      touchClone.style.cssText = `position:fixed;pointer-events:none;z-index:200;width:54px;height:54px;left:${t.clientX-27}px;top:${t.clientY-27}px;opacity:.8;`;
+      document.body.appendChild(touchClone);
+      d.style.opacity = '.3';
+    }, {passive:true});
+    d.addEventListener('touchmove', e=>{
+      if(!touchClone) return;
+      const t = e.touches[0];
+      touchClone.style.left = (t.clientX-27)+'px';
+      touchClone.style.top = (t.clientY-27)+'px';
+      // Highlight zone under finger
+      zones.forEach(z=>z.classList.remove('over'));
+      const el = document.elementFromPoint(t.clientX, t.clientY);
+      const zone = el?.closest('.drop-zone');
+      if(zone) zone.classList.add('over');
+      e.preventDefault();
+    });
+    d.addEventListener('touchend', e=>{
+      if(!touchClone) return;
+      const t = e.changedTouches[0];
+      const el = document.elementFromPoint(t.clientX, t.clientY);
+      const zone = el?.closest('.drop-zone');
+      if(zone){
+        zone.querySelector('.drop-zone-items').appendChild(d);
+        sndDrop();
+      }
+      touchClone.remove(); touchClone = null;
+      d.style.opacity = '';
+      zones.forEach(z=>z.classList.remove('over'));
+      dragged = null;
+    });
+  });
+
+  zones.forEach(z=>{
+    z.addEventListener('dragover', e=>{ e.preventDefault(); z.classList.add('over'); });
+    z.addEventListener('dragleave', ()=>z.classList.remove('over'));
+    z.addEventListener('drop', e=>{
+      e.preventDefault();
+      z.classList.remove('over');
+      if(dragged){
+        z.querySelector('.drop-zone-items').appendChild(dragged);
+        sndDrop();
+      }
+    });
+  });
+
+  document.getElementById('verifyBtn').onclick = ()=>{
+    if(state.answered) return;
+    state.answered = true;
+    document.getElementById('verifyBtn').disabled = true;
+    let allCorrect = true;
+    let placed = 0;
+    items.forEach(k=>{
+      const elem = document.querySelector(`.draggable[data-key="${k}"]`);
+      const inZoneA = elem.closest('.drop-zone[data-zone="a"]');
+      const inZoneB = elem.closest('.drop-zone[data-zone="b"]');
+      if(!inZoneA && !inZoneB) return; // not placed
+      placed++;
+      const correctZone = zoneA.match(k) ? 'a' : 'b';
+      const placedZone = inZoneA ? 'a' : 'b';
+      if(correctZone !== placedZone) allCorrect = false;
+    });
+
+    if(placed < items.length){
+      registerMiss(`✗ Faltó clasificar ${items.length-placed} figura(s)`);
+    } else if(allCorrect){
+      registerHit(`✓ ¡Perfecto! Todas bien clasificadas`);
+    } else {
+      registerMiss(`✗ Algunas figuras están en la zona equivocada`);
+    }
+  };
+}
+
+// ═══ MODE 5/6: CONSTRUCT (grade 5/6) ═══
+function round_construct(withAngles){
+  // Pedir construir un polígono específico
+  const targets = withAngles
+    ? [
+        {name:'triángulo equilátero', sides:3, equal:true, anglesEqual:true},
+        {name:'cuadrado', sides:4, equal:true, anglesEqual:true},
+        {name:'pentágono regular', sides:5, equal:true, anglesEqual:true}
+      ]
+    : [
+        {name:'triángulo', sides:3},
+        {name:'cuadrilátero', sides:4},
+        {name:'pentágono', sides:5}
+      ];
+  const target = targets[rnd(0, targets.length-1)];
+
+  document.getElementById('qTag').textContent = `RETO ${state.round}/${state.totalRounds}`;
+  document.getElementById('qText').innerHTML = `Construye un <span class="q-emph">${target.name}</span>${withAngles?' con ángulos iguales':''}`;
+
+  // Generar vertices iniciales (desorganizados pero formando polígono)
+  const cx = 200, cy = 140, r = 70;
+  const vertices = [];
+  for(let i=0;i<target.sides;i++){
+    const angle = (i/target.sides)*Math.PI*2 - Math.PI/2;
+    // Variar radio para que NO sea perfecto al inicio
+    const rVar = r + rnd(-30,30);
+    vertices.push({
+      x: cx + Math.cos(angle)*rVar,
+      y: cy + Math.sin(angle)*rVar
+    });
+  }
+
+  document.getElementById('qContent').innerHTML = `
+    <div class="construct-canvas">
+      <svg viewBox="0 0 400 280" id="constructSvg">
+        <g class="canvas-grid">
+          ${Array.from({length:21},(_,i)=>`<line x1="${i*20}" y1="0" x2="${i*20}" y2="280"/>`).join('')}
+          ${Array.from({length:15},(_,i)=>`<line x1="0" y1="${i*20}" x2="400" y2="${i*20}"/>`).join('')}
+        </g>
+        <polygon class="canvas-shape" id="shapePoly" points=""/>
+        <g id="vertexGroup"></g>
+      </svg>
+    </div>
+    <div class="construct-info">
+      <div class="construct-info-row" id="infoSides">
+        <span>LADOS</span>
+        <span class="ci-val">${target.sides}</span>
+      </div>
+      <div class="construct-info-row" id="infoEqual">
+        <span>${withAngles?'ÁNGULOS':'LADOS IGUALES'}</span>
+        <span class="ci-val">—</span>
+      </div>
+    </div>
+    <button class="verify-btn" id="verifyBtn">✓ VERIFICAR FIGURA</button>
+  `;
+
+  state.constructVertices = vertices;
+  state.constructTarget = target;
+  state.constructWithAngles = withAngles;
+  drawShape();
+  setupVertexDrag();
+
+  document.getElementById('verifyBtn').onclick = verifyConstruct;
+}
+
+function drawShape(){
+  const verts = state.constructVertices;
+  const points = verts.map(v=>`${v.x},${v.y}`).join(' ');
+  document.getElementById('shapePoly').setAttribute('points', points);
+  // Draw vertices
+  const grp = document.getElementById('vertexGroup');
+  grp.innerHTML = verts.map((v,i)=>
+    `<circle class="canvas-vertex" data-idx="${i}" cx="${v.x}" cy="${v.y}" r="8"/>`
+  ).join('');
+  // Update info panel
+  updateConstructInfo();
+  // Re-setup drag
+  setupVertexDrag();
+}
+
+function updateConstructInfo(){
+  const verts = state.constructVertices;
+  const sides = computeSides(verts);
+  const allEqual = checkAllEqual(sides, 12); // tolerancia 12px
+
+  const eqRow = document.getElementById('infoEqual');
+  if(state.constructWithAngles){
+    const angles = computeAngles(verts);
+    const anglesEqual = checkAllEqual(angles, 8); // tolerancia 8°
+    eqRow.querySelector('.ci-val').textContent = anglesEqual?'✓ Iguales':'No iguales';
+    eqRow.classList.toggle('ok', anglesEqual);
+    eqRow.classList.toggle('bad', !anglesEqual);
+  } else {
+    eqRow.querySelector('.ci-val').textContent = allEqual?'✓ Sí':'No';
+    eqRow.classList.toggle('ok', allEqual);
+    eqRow.classList.toggle('bad', !allEqual);
+  }
+}
+
+function computeSides(verts){
+  const out = [];
+  for(let i=0;i<verts.length;i++){
+    const a = verts[i], b = verts[(i+1)%verts.length];
+    out.push(Math.hypot(b.x-a.x, b.y-a.y));
+  }
+  return out;
+}
+function computeAngles(verts){
+  const out = [];
+  const n = verts.length;
+  for(let i=0;i<n;i++){
+    const prev = verts[(i-1+n)%n];
+    const curr = verts[i];
+    const next = verts[(i+1)%n];
+    const v1 = {x:prev.x-curr.x, y:prev.y-curr.y};
+    const v2 = {x:next.x-curr.x, y:next.y-curr.y};
+    const dot = v1.x*v2.x + v1.y*v2.y;
+    const m1 = Math.hypot(v1.x,v1.y);
+    const m2 = Math.hypot(v2.x,v2.y);
+    const ang = Math.acos(Math.max(-1,Math.min(1, dot/(m1*m2)))) * 180/Math.PI;
+    out.push(ang);
+  }
+  return out;
+}
+function checkAllEqual(arr, tol){
+  if(arr.length<2) return true;
+  const max = Math.max(...arr), min = Math.min(...arr);
+  return (max - min) <= tol;
+}
+
+function setupVertexDrag(){
+  const svg = document.getElementById('constructSvg');
+  if(!svg) return;
+  const verts = document.querySelectorAll('.canvas-vertex');
+  verts.forEach(v=>{
+    let dragging = false;
+    const idx = parseInt(v.dataset.idx);
+
+    const onStart = (e)=>{
+      dragging = true; v.classList.add('dragging');
+      e.preventDefault();
+    };
+    const onMove = (e)=>{
+      if(!dragging) return;
+      const rect = svg.getBoundingClientRect();
+      const isTouch = e.touches;
+      const cx = isTouch ? e.touches[0].clientX : e.clientX;
+      const cy = isTouch ? e.touches[0].clientY : e.clientY;
+      // Convert to SVG coords
+      const xRatio = 400/rect.width;
+      const yRatio = 280/rect.height;
+      let nx = (cx - rect.left) * xRatio;
+      let ny = (cy - rect.top) * yRatio;
+      // Clamp
+      nx = Math.max(15, Math.min(385, nx));
+      ny = Math.max(15, Math.min(265, ny));
+      state.constructVertices[idx].x = nx;
+      state.constructVertices[idx].y = ny;
+      v.setAttribute('cx', nx);
+      v.setAttribute('cy', ny);
+      // Update polygon
+      const points = state.constructVertices.map(p=>`${p.x},${p.y}`).join(' ');
+      document.getElementById('shapePoly').setAttribute('points', points);
+      updateConstructInfo();
+    };
+    const onEnd = ()=>{ dragging = false; v.classList.remove('dragging'); };
+
+    v.addEventListener('mousedown', onStart);
+    v.addEventListener('touchstart', onStart, {passive:false});
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('touchmove', onMove, {passive:false});
+    document.addEventListener('mouseup', onEnd);
+    document.addEventListener('touchend', onEnd);
+  });
+}
+
+function verifyConstruct(){
+  if(state.answered) return;
+  state.answered = true;
+  document.getElementById('verifyBtn').disabled = true;
+  const verts = state.constructVertices;
+  const target = state.constructTarget;
+  const sides = computeSides(verts);
+  const allEqual = checkAllEqual(sides, 12);
+
+  let ok = true;
+  let msg = '';
+
+  // Verificar número de lados es trivial (no se puede cambiar)
+  if(state.constructWithAngles){
+    const angles = computeAngles(verts);
+    const anglesEqual = checkAllEqual(angles, 8);
+    if(!anglesEqual || !allEqual){
+      ok = false;
+      msg = `✗ Aún no es regular. Ajusta los vértices`;
+    }
+  } else {
+    // Solo necesita ser un polígono válido (no autointersecante - simplificación: solo verifica que tenga lados)
+    // En modo "construir libre" basta con que sea un polígono cualquiera del número correcto
+    // pero podemos exigir que no sea totalmente degenerado
+    const minSide = Math.min(...sides);
+    if(minSide < 25){
+      ok = false;
+      msg = `✗ Algunos lados son muy cortos. Sepáralos más`;
+    }
+  }
+
+  if(ok){
+    registerHit(`✓ ¡${target.name.charAt(0).toUpperCase()+target.name.slice(1)} válido!`);
+  } else {
+    registerMiss(msg);
+  }
+}
+
+// ═══ HIT/MISS HANDLERS ═══
+function registerHit(msg){
+  state.correct++;
+  state.score += 10;
+  showFeedback(msg, 'hit');
+  sndOk();
+  setTimeout(nextRound, 1400);
+}
+function registerMiss(msg){
+  state.wrong++;
+  state.lives--;
+  updateHUD();
+  showFeedback(msg, 'miss');
+  sndBad();
+  if(state.lives <= 0){ setTimeout(showLose, 1400); return; }
+  setTimeout(nextRound, 1800);
+}
+function showFeedback(msg, cls){
+  const fb = document.getElementById('feedback');
+  fb.textContent = msg;
+  fb.className = 'feedback ' + cls;
+}
+
+// ═══ END SCREENS ═══
+function showWin(){
+  sndWin();
+  const duration = Math.round((Date.now()-state.startTime)/1000);
+  const stars = state.lives===3?'⭐⭐⭐':state.lives===2?'⭐⭐':'⭐';
+  document.getElementById('winStars').textContent = stars;
+  document.getElementById('winSub').textContent =
+    state.lives===3 ? '¡Misión perfecta, eres un experto!' :
+    state.lives===2 ? '¡Buen trabajo, geómetra!' :
+    '¡Lo lograste con esfuerzo!';
+  document.getElementById('winStats').innerHTML = `
+    <div class="ov-stat-row"><span>Aciertos</span><span class="v">${state.correct}/${state.totalRounds}</span></div>
+    <div class="ov-stat-row"><span>Errores</span><span class="v">${state.wrong}</span></div>
+    <div class="ov-stat-row"><span>Tiempo</span><span class="v">${duration}s</span></div>
+    <div class="ov-stat-row"><span>Grado</span><span class="v">${cfg.grade}°</span></div>
+  `;
+  document.getElementById('ovWin').classList.add('show');
+  savePartida('ganado', duration);
+}
+function showLose(){
+  sndBad();
+  const duration = Math.round((Date.now()-state.startTime)/1000);
+  document.getElementById('loseSub').textContent =
+    `Llegaste hasta el reto ${state.round}/${state.totalRounds}. ¡Inténtalo otra vez!`;
+  document.getElementById('ovLose').classList.add('show');
+  savePartida('perdido', duration);
+}
+
+// ═══ FIRESTORE SAVE ═══
+async function savePartida(resultado, duration){
+  if(!window.AUTH_USER) return;
+  try {
+    const user = window.AUTH_USER;
+    const partida = {
+      juego:'constructor-figuras',
+      grado: cfg.grade,
+      modo: ['identify','count','classify','construct','construct-angles'][cfg.grade-2],
+      resultado,
+      duracionSegundos: duration,
+      aciertos: state.correct,
+      errores: state.wrong,
+      vidasRestantes: state.lives,
+      jugador: cfg.name,
+      creadoEn: serverTimestamp()
+    };
+    await addDoc(collection(db,'users',user.uid,'partidas'), partida);
+    await updateDoc(doc(db,'users',user.uid), {
+      'stats.totalPartidas': increment(1),
+      'stats.tiempoTotalSegundos': increment(duration),
+      'stats.juegosJugados.constructor-figuras': increment(1),
+      'stats.ultimoAcceso': serverTimestamp()
+    });
+    console.log('✅ Partida guardada');
+  } catch(err){ console.warn('No se pudo guardar partida:', err); }
+}
+</script>
+
+</body>
+</html>
