@@ -531,9 +531,11 @@ setTimeout(()=>{ document.getElementById('pfill').style.width='20%'; },400);
 <!-- ═══ SCRIPT DE AUTH (agregado v0.2) ═══ -->
 <script type="module">
 import { requireAuth, logout, getDisplayName, getRoleLabel } from './js/auth.js';
+import { initPresence } from './js/presence.js';
 
 try {
   const user = await requireAuth();
+  initPresence(user, 'dashboard', '🎮 Catálogo');
 
   document.getElementById('userName').textContent = getDisplayName(user);
   document.getElementById('userRole').textContent = getRoleLabel(user.rol);
