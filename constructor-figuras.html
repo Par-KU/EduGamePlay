@@ -638,12 +638,14 @@ body{
 <!-- ═══ AUTH SCRIPT ═══ -->
 <script type="module">
 import { requireAuth, logout, getDisplayName, getRoleLabel } from './js/auth.js';
+import { initPresence } from './js/presence.js';
 
 let authUser = null;
 try {
   const user = await requireAuth();
   authUser = user;
   window.AUTH_USER = user;
+  initPresence(user, 'constructor-figuras', '📐 Constructor de Figuras');
   document.getElementById('userName').textContent = getDisplayName(user);
   document.getElementById('userRole').textContent = getRoleLabel(user.rol);
   const pn = document.getElementById('pName');
