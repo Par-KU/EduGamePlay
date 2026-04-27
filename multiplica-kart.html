@@ -475,6 +475,7 @@ body{background:#111;display:flex;flex-direction:column;align-items:center;min-h
 <!-- ══════════════════════════════════════════════ -->
 <script type="module">
 import { requireAuth, logout, getDisplayName, getRoleLabel } from './js/auth.js';
+import { initPresence } from './js/presence.js';
 import { db } from './js/firebase-config.js';
 import {
   collection, addDoc, doc, updateDoc, increment, serverTimestamp
@@ -485,6 +486,7 @@ import {
 let currentUser = null;
 try {
   currentUser = await requireAuth();
+  initPresence(user, 'multiplica-kart', '🏎️ Multiplica Kart');
 } catch(err){
   // requireAuth ya redirigió, aquí no hacemos nada
   throw err;
