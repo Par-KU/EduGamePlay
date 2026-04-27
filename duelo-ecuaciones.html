@@ -627,6 +627,7 @@ try {
   const user = await requireAuth();
   authUser = user;
   window.AUTH_USER = user;
+  initPresence(user, 'duelo-ecuaciones', '⚔️ Duelo de Ecuaciones');
 
   document.getElementById('userName').textContent = getDisplayName(user);
   document.getElementById('userRole').textContent = getRoleLabel(user.rol);
