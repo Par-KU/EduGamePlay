@@ -486,7 +486,7 @@ import {
 let currentUser = null;
 try {
   currentUser = await requireAuth();
-  initPresence(user, 'multiplica-kart', '🏎️ Multiplica Kart');
+  initPresence(currentUser, 'multiplica-kart', '🏎️ Multiplica Kart');
 } catch(err){
   // requireAuth ya redirigió, aquí no hacemos nada
   throw err;
