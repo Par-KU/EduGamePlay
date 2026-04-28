@@ -85,9 +85,19 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
   padding:10px 14px;cursor:pointer;white-space:nowrap;
   border-bottom:2px solid transparent;transition:color .15s,border-color .15s;
   -webkit-tap-highlight-color:transparent;
+  position:relative;
 }
 .tab.active{color:var(--accent);border-bottom-color:var(--accent);}
 .tab:hover:not(.active){color:var(--text);}
+/* Badge live counter en pestaña Sesiones */
+.tab .live-badge{
+  display:none;background:rgba(74,222,128,.15);color:var(--green);
+  font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;margin-left:5px;
+  border:1px solid rgba(74,222,128,.3);
+}
+.tab .live-badge.show{display:inline-flex;align-items:center;gap:3px;}
+.tab .live-badge::before{content:'●';font-size:7px;animation:pulse 1.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
 
 /* ── MAIN ── */
 main{max-width:1200px;margin:0 auto;padding:20px 16px 60px;}
@@ -151,10 +161,11 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px 60px;}
   background:var(--bg2);border:1px solid var(--border);border-radius:12px;
   overflow:hidden;
 }
+/* ═══ MODIFICADO v0.3: agregada columna ESTADO LIVE ═══ */
 .users-table-header{
   display:grid;
-  grid-template-columns:1fr 120px 100px 100px 90px;
-  gap:10px;padding:12px 14px;
+  grid-template-columns:1fr 110px 120px 90px 80px 110px;
+  gap:8px;padding:12px 14px;
   background:rgba(167,139,250,.05);border-bottom:1px solid var(--border);
   font-size:10px;color:var(--purple);font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
 }
@@ -162,8 +173,8 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px 60px;}
 
 .user-row{
   display:grid;
-  grid-template-columns:1fr 120px 100px 100px 90px;
-  gap:10px;padding:12px 14px;align-items:center;
+  grid-template-columns:1fr 110px 120px 90px 80px 110px;
+  gap:8px;padding:12px 14px;align-items:center;
   border-bottom:1px solid var(--border);
   transition:background .12s;
 }
@@ -182,6 +193,21 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px 60px;}
 .status-pill{font-size:10px;font-weight:700;}
 .status-active{color:var(--green);}
 .status-inactive{color:var(--muted);}
+
+/* ═══ NUEVO v0.3: ESTADO LIVE CELL ═══ */
+.live-cell{font-size:10px;line-height:1.4;min-width:0;}
+.live-cell .live-status{display:flex;align-items:center;gap:5px;font-weight:700;white-space:nowrap;}
+.live-cell .live-status.online{color:var(--green);}
+.live-cell .live-status.inactive{color:var(--accent);}
+.live-cell .live-status.offline{color:var(--muted);}
+.live-cell .live-status .dot{
+  width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0;
+}
+.live-cell .live-status.online .dot{background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 1.5s ease-in-out infinite;}
+.live-cell .live-status.inactive .dot{background:var(--accent);}
+.live-cell .live-status.offline .dot{background:var(--muted);}
+.live-cell .live-detail{color:var(--muted);font-size:10px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
 .row-actions{display:flex;gap:4px;justify-content:flex-end;}
 .row-btn{
   background:transparent;border:1px solid var(--border);color:var(--muted);
@@ -197,14 +223,15 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px 60px;}
 }
 .empty-state .icon{font-size:40px;margin-bottom:10px;opacity:.4;}
 
-/* ── RESPONSIVE TABLE (cards en móvil) ── */
-@media(max-width:680px){
+/* ═══ MODIFICADO v0.3: responsive con nueva columna ═══ */
+@media(max-width:780px){
   .users-table-header{display:none;}
   .user-row{
     grid-template-columns:1fr auto;
     grid-template-areas:
       "name actions"
       "role role"
+      "live live"
       "status status";
     gap:8px;padding:12px;
     border:1px solid var(--border);border-radius:10px;margin-bottom:8px;
@@ -213,6 +240,7 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px 60px;}
   .user-row:hover{background:rgba(255,255,255,.02);}
   .user-cell-name{grid-area:name;}
   .user-cell-role{grid-area:role;}
+  .user-cell-live{grid-area:live;}
   .user-cell-status{grid-area:status;font-size:11px;}
   .user-cell-created{display:none;}
   .row-actions{grid-area:actions;}
@@ -230,6 +258,8 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px 60px;}
   padding:clamp(20px,4vw,28px);max-width:480px;width:100%;
   max-height:90vh;overflow-y:auto;
 }
+/* ═══ NUEVO v0.3: modal historial más ancho ═══ */
+.modal-box.wide{max-width:640px;}
 .modal-title{
   font-family:'Fredoka One',cursive;font-size:20px;color:var(--text);
   margin-bottom:6px;display:flex;align-items:center;gap:8px;
@@ -322,6 +352,135 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px 60px;}
 .coming-soon .icon{font-size:48px;margin-bottom:10px;opacity:.6;}
 .coming-soon .title{font-family:'Fredoka One',cursive;color:var(--text);font-size:18px;margin-bottom:6px;}
 
+/* ═══════════════════════════════════════════ */
+/* ═══ NUEVO v0.3: SESIONES LIVE STYLES ═══ */
+/* ═══════════════════════════════════════════ */
+
+/* Header live pulsante */
+.live-header{
+  background:linear-gradient(135deg,rgba(74,222,128,.1),rgba(96,165,250,.05));
+  border:1px solid rgba(74,222,128,.3);
+  border-radius:12px;padding:14px 18px;margin-bottom:16px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
+}
+.live-header-title{
+  display:flex;align-items:center;gap:10px;
+  font-family:'Fredoka One',cursive;font-size:16px;color:var(--text);
+}
+.live-header-title .live-dot{
+  width:10px;height:10px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 12px var(--green);animation:pulse 1.5s ease-in-out infinite;
+}
+.live-header-info{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.live-header-info .updating-indicator{
+  display:inline-block;color:var(--green);margin-left:6px;
+  opacity:0;transition:opacity .3s;
+}
+.live-header-info .updating-indicator.show{opacity:1;}
+
+/* Cards de jugadores activos */
+.live-players-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));
+  gap:10px;
+}
+.live-player-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  padding:12px 14px;display:flex;gap:10px;align-items:center;
+  border-left:4px solid var(--green);transition:all .15s;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.live-player-card.inactive{border-left-color:var(--accent);}
+.live-player-card.offline{border-left-color:var(--muted);opacity:.65;}
+.live-player-card:hover{background:var(--bg3);transform:translateY(-2px);}
+.live-player-avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(167,139,250,.15);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fredoka One',cursive;color:var(--purple);font-size:14px;
+  flex-shrink:0;
+}
+.live-player-info{flex:1;min-width:0;}
+.live-player-name{font-weight:700;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.live-player-where{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+.live-player-time{font-size:10px;color:var(--green);font-weight:700;flex-shrink:0;text-align:right;}
+
+/* Actividad por juego */
+.games-activity{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:16px;margin-bottom:16px;
+}
+.games-activity-title{
+  font-family:'Fredoka One',cursive;font-size:15px;margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.game-activity-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 0;border-bottom:1px solid var(--border);
+}
+.game-activity-row:last-child{border-bottom:none;}
+.game-activity-name{font-size:13px;color:var(--text);}
+.game-activity-count{
+  display:flex;align-items:center;gap:8px;font-size:12px;
+}
+.game-activity-count .dots{display:flex;gap:3px;}
+.game-activity-count .dots span{
+  width:8px;height:8px;border-radius:50%;background:var(--green);
+  animation:pulse 1.5s ease-in-out infinite;
+}
+.game-activity-count .num{font-family:'Fredoka One',cursive;color:var(--green);font-size:14px;}
+.game-activity-count.zero .num{color:var(--muted);}
+.game-activity-count.zero .dots{display:none;}
+
+/* ═══════════════════════════════════════════ */
+/* ═══ NUEVO v0.3: HISTORIAL MODAL ═══ */
+/* ═══════════════════════════════════════════ */
+.history-summary{
+  background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2);
+  border-radius:10px;padding:14px;margin-bottom:16px;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center;
+}
+.history-summary-item .v{
+  font-family:'Fredoka One',cursive;font-size:18px;color:var(--accent);display:block;line-height:1;
+}
+.history-summary-item .l{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:4px;}
+
+.history-day-group{margin-bottom:18px;}
+.history-day-label{
+  font-size:11px;font-weight:800;color:var(--purple);letter-spacing:1.5px;text-transform:uppercase;
+  margin-bottom:8px;padding-bottom:4px;border-bottom:1px dashed var(--border);
+}
+.history-session{
+  background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:8px;
+  padding:10px 12px;margin-bottom:6px;
+}
+.history-session-head{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:12px;margin-bottom:6px;
+}
+.history-session-head .time{color:var(--text);font-weight:700;}
+.history-session-head .duration{color:var(--green);font-family:'Fredoka One',cursive;font-size:11px;}
+.history-session-pills{display:flex;flex-wrap:wrap;gap:4px;}
+.history-pill{
+  font-size:10px;padding:3px 8px;border-radius:12px;
+  background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);
+  color:var(--text);white-space:nowrap;
+}
+.history-pill .seg{color:var(--muted);margin-left:4px;font-size:9px;}
+
+.history-empty{
+  padding:30px 20px;text-align:center;color:var(--muted);font-size:13px;
+}
+.history-empty .icon{font-size:36px;opacity:.4;margin-bottom:8px;}
+
+.history-loading{
+  text-align:center;padding:30px;color:var(--muted);
+}
+.history-loading .spinner{
+  width:32px;height:32px;border:3px solid rgba(167,139,250,.2);
+  border-top-color:var(--purple);border-radius:50%;
+  animation:spin .8s linear infinite;display:inline-block;margin-bottom:10px;
+}
+
 /* ── FOOTER MINI ── */
 .footer-mini{text-align:center;padding:20px 16px 10px;color:var(--muted);font-size:11px;line-height:1.6;}
 .footer-mini-brand{
@@ -356,7 +515,7 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px 60px;}
 <div class="tabs" id="tabs">
   <button class="tab active" data-tab="users">👥 Usuarios</button>
   <button class="tab" data-tab="stats">📊 Estadísticas</button>
-  <button class="tab" data-tab="sessions">🟢 Sesiones</button>
+  <button class="tab" data-tab="sessions">🟢 Sesiones <span class="live-badge" id="liveTabBadge">0</span></button>
 </div>
 
 <main>
@@ -392,6 +551,7 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px 60px;}
     </div>
     <div class="filter-chips">
       <button class="chip active" data-filter="all">Todos</button>
+      <button class="chip" data-filter="online">🟢 Online</button>
       <button class="chip" data-filter="admin">👑 Admins</button>
       <button class="chip" data-filter="docente">🎓 Docentes</button>
       <button class="chip" data-filter="alumno">📚 Alumnos</button>
@@ -400,12 +560,13 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px 60px;}
     <button class="btn-primary" id="openCreateBtn">➕ Nuevo usuario</button>
   </div>
 
-  <!-- Tabla -->
+  <!-- Tabla con nueva columna ESTADO LIVE -->
   <div class="users-table-wrap">
     <div class="users-table-header">
       <div>Usuario</div>
       <div>Rol</div>
-      <div>Estado</div>
+      <div>Estado live</div>
+      <div>Activo</div>
       <div>Creado</div>
       <div>Acciones</div>
     </div>
@@ -469,20 +630,70 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px 60px;}
   </div>
 </div>
 
-<!-- TAB: SESIONES -->
+<!-- ═══════════════════════════════════════════ -->
+<!-- ═══ NUEVO v0.3: TAB SESIONES LIVE      ═══ -->
+<!-- ═══════════════════════════════════════════ -->
 <div class="tab-content" id="tab-sessions">
-  <div class="coming-soon">
-    <div class="icon">🟢</div>
-    <div class="title">Sesiones en vivo</div>
-    <div>Próximamente: verás en tiempo real quién está conectado,<br>desde dónde y qué juego está jugando.</div>
-    <div style="margin-top:14px;font-size:11px;color:var(--muted);">
-      Requiere implementar el sistema de presencia con Realtime Database.<br>
-      Lo activaremos en la siguiente fase.
+
+  <!-- Header pulsante en vivo -->
+  <div class="live-header">
+    <div class="live-header-title">
+      <span class="live-dot"></span>
+      <span><span id="liveCountTotal">0</span> conectados ahora</span>
+    </div>
+    <div class="live-header-info">
+      Actualización en tiempo real
+      <span class="updating-indicator" id="updatingIndicator">●</span>
     </div>
   </div>
-</div>
 
-</main>
+  <!-- Stats cards live -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-card-label">🟢 En línea</div>
+      <div class="stat-card-value sv-green" id="liveOnlineNum">0</div>
+      <div class="stat-card-sub">Activos en este momento</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">🎮 Jugando</div>
+      <div class="stat-card-value sv-accent" id="livePlayingNum">0</div>
+      <div class="stat-card-sub">Dentro de un juego</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">📋 En menú</div>
+      <div class="stat-card-value sv-blue" id="liveMenuNum">0</div>
+      <div class="stat-card-sub">Catálogo / panel</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">🟡 Inactivos</div>
+      <div class="stat-card-value sv-pink" id="liveInactiveNum">0</div>
+      <div class="stat-card-sub">Sin actividad reciente</div>
+    </div>
+  </div>
+
+  <!-- Actividad por juego -->
+  <div class="games-activity">
+    <div class="games-activity-title">📍 Actividad por juego</div>
+    <div id="gamesActivityList">
+      <div class="empty-state" style="padding:20px 0;">
+        <div style="opacity:.6;">Esperando actividad...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cards de jugadores conectados -->
+  <div class="games-activity">
+    <div class="games-activity-title">👥 Usuarios en línea</div>
+    <div class="live-players-grid" id="livePlayersGrid">
+      <div class="empty-state" style="padding:30px 20px;grid-column:1/-1;">
+        <div class="icon">😴</div>
+        <div>Nadie conectado en este momento</div>
+        <div style="font-size:11px;margin-top:6px;">Cuando alguien entre a la plataforma aparecerá aquí en vivo</div>
+      </div>
+    </div>
+  </div>
+
+</div>
 
 <!-- ═══════════════════════════════ -->
 <!-- MODAL: CREAR USUARIO -->
@@ -640,9 +851,47 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px 60px;}
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════ -->
+<!-- ═══ NUEVO v0.3: MODAL HISTORIAL SESIONES ═══ -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalHistory">
+  <div class="modal-box wide">
+    <div class="modal-title">📊 Historial de sesiones</div>
+    <div class="modal-sub" id="hSub">Cargando historial...</div>
+
+    <!-- Resumen -->
+    <div class="history-summary" id="hSummary" style="display:none;">
+      <div class="history-summary-item">
+        <span class="v" id="hSummarySessions">0</span>
+        <span class="l">Sesiones</span>
+      </div>
+      <div class="history-summary-item">
+        <span class="v" id="hSummaryTime">0m</span>
+        <span class="l">Tiempo total</span>
+      </div>
+      <div class="history-summary-item">
+        <span class="v" id="hSummaryAvg">0m</span>
+        <span class="l">Promedio</span>
+      </div>
+    </div>
+
+    <!-- Sesiones agrupadas por día -->
+    <div id="historyContent">
+      <div class="history-loading">
+        <div class="spinner"></div>
+        <div>Cargando historial...</div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-btn primary" id="hClose">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 <!-- FOOTER -->
 <div class="footer-mini">
-  <div><span class="footer-mini-brand">EduGamePlay</span> · Panel de Administración · v 0.2</div>
+  <div><span class="footer-mini-brand">EduGamePlay</span> · Panel de Administración · v 0.3</div>
   <div>© 2026 Juan Pariona</div>
 </div>
 
